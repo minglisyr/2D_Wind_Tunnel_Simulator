@@ -1,0 +1,664 @@
+const canvas = document.getElementById("myCanvas");
+const ctx = canvas.getContext("2d", {
+    willReadFrequently: true
+});
+
+canvas.width = window.innerWidth - 20;
+canvas.height = window.innerHeight - 100;
+canvas.focus();
+
+const simHeight = 1.005;
+const cScale = canvas.height / simHeight;
+const simWidth = canvas.width / cScale;
+
+const U_FIELD = 1;
+const V_FIELD = 2;
+const S_FIELD = 9;
+
+let counter = 0;
+
+// ----------------- Fluid core algorithm ------------------------------
+
+class Fluid {
+    constructor(numX, numY, h, density) {
+        // Initialize fluid properties
+        this.numX = numX + 2; // Grid cells in X direction (including 2 boundary cells)
+        this.numY = numY + 2; // Grid cells in Y direction (including 2 boundary cells)
+        this.numCells = this.numX * this.numY; // Total number of cells
+        this.h = h; // Cell size
+        this.density = density; // Fluid density
+
+        // Initialize arrays for fluid properties
+        this.u = new Float32Array(this.numCells);
+        this.v = new Float32Array(this.numCells);
+        this.newU = new Float32Array(this.numCells);
+        this.newV = new Float32Array(this.numCells);
+
+        this.p = new Float32Array(this.numCells);
+        this.s = new Float32Array(this.numCells);
+        this.m = new Float32Array(this.numCells);
+        this.newM = new Float32Array(this.numCells);
+        
+        this.m.fill(1.0); // Initialize smoke density to 1.0 everywhere
+    }
+
+    solveIncomp(dt, maxIters) {
+        const n = this.numY;
+        const cp = this.density * this.h / dt; // Pressure coefficient
+
+        // Iterate to solve for pressure and enforce incompressibility
+        for (let iter = 0; iter < maxIters; iter++) {
+            for (let i = 1; i < this.numX - 1; i++) {
+                for (let j = 1; j < this.numY - 1; j++) {
+                    if (this.s[i * n + j] == 0.0) continue; // Skip non-fluid cells
+
+                    // Calculate divergence
+                    const sx0 = this.s[(i - 1) * n + j];
+                    const sx1 = this.s[(i + 1) * n + j];
+                    const sy0 = this.s[i * n + j - 1];
+                    const sy1 = this.s[i * n + j + 1];
+                    const s = sx0 + sx1 + sy0 + sy1;
+                    if (s == 0.0) continue;
+
+                    const div = this.u[(i + 1) * n + j] - this.u[i * n + j] + this.v[i * n + j + 1] - this.v[i * n + j];
+
+                    // Calculate pressure correction
+                    let p = -div / s;
+                    p *= scene.overRelaxation;
+                    this.p[i * n + j] += cp * p;
+
+                    // Apply pressure correction to velocities
+                    this.u[i * n + j] -= sx0 * p;
+                    this.u[(i + 1) * n + j] += sx1 * p;
+                    this.v[i * n + j] -= sy0 * p;
+                    this.v[i * n + j + 1] += sy1 * p;
+                }
+            }
+        }
+    }
+
+    sampleField(x, y, field) {
+        // Bilinear interpolation to sample field at given (x, y) position
+        const n = this.numY;
+        const h = this.h;
+        const h1 = 1.0 / h;
+        const h2 = 0.5 * h;
+
+        x = Math.max(Math.min(x, this.numX * h), h);
+        y = Math.max(Math.min(y, this.numY * h), h);
+
+        let dx = 0.0;
+        let dy = 0.0;
+        let f;
+
+        switch (field) {
+            case U_FIELD:
+                f = this.u;
+                dy = h2;
+                break;
+            case V_FIELD:
+                f = this.v;
+                dx = h2;
+                break;
+            case S_FIELD:
+                f = this.m;
+                dx = h2;
+                dy = h2;
+                break;
+        }
+
+        const x0 = Math.min(Math.floor((x - dx) * h1), this.numX - 1);
+        const tx = ((x - dx) - x0 * h) * h1;
+        const x1 = Math.min(x0 + 1, this.numX - 1);
+        const y0 = Math.min(Math.floor((y - dy) * h1), this.numY - 1);
+        const ty = ((y - dy) - y0 * h) * h1;
+        const y1 = Math.min(y0 + 1, this.numY - 1);
+        const sx = 1.0 - tx;
+        const sy = 1.0 - ty;
+
+        return sx * sy * f[x0 * n + y0] +
+            tx * sy * f[x1 * n + y0] +
+            tx * ty * f[x1 * n + y1] +
+            sx * ty * f[x0 * n + y1];
+    }
+
+    avgU(i, j) {
+        // Calculate average horizontal velocity at cell center
+        const n = this.numY;
+        return (this.u[i * n + j - 1] + this.u[i * n + j] +
+            this.u[(i + 1) * n + j - 1] + this.u[(i + 1) * n + j]) * 0.25;
+    }
+
+    avgV(i, j) {
+        // Calculate average vertical velocity at cell center
+        const n = this.numY;
+        return (this.v[(i - 1) * n + j] + this.v[i * n + j] +
+            this.v[(i - 1) * n + j + 1] + this.v[i * n + j + 1]) * 0.25;
+    }
+
+    applyBoundaryConditions() {
+        const n = this.numY;
+
+        // Extrapolate horizontal velocities to boundary cells
+        for (let i = 0; i < this.numX; i++) {
+            this.u[i * n + 0] = this.u[i * n + 1];
+            this.u[i * n + this.numY - 1] = this.u[i * n + this.numY - 2];
+        }
+
+        // Extrapolate vertical velocities to boundary cells
+        for (let j = 0; j < this.numY; j++) {
+            this.v[0 * n + j] = this.v[1 * n + j];
+            this.v[(this.numX - 1) * n + j] = this.v[(this.numX - 2) * n + j];
+        }
+    }
+
+    advectVel(dt) {
+        // Semi-Lagrangian advection of velocity field
+        this.newU.set(this.u);
+        this.newV.set(this.v);
+        const n = this.numY;
+        const h = this.h;
+        const h2 = 0.5 * h;
+
+        for (let i = 1; i < this.numX; i++) {
+            for (let j = 1; j < this.numY; j++) {
+                // Advect horizontal velocity
+                if (this.s[i * n + j] != 0.0 && this.s[(i - 1) * n + j] != 0.0 && j < this.numY - 1) {
+                    let x = i * h;
+                    let y = j * h + h2;
+                    let u = this.u[i * n + j];
+                    let v = this.avgV(i, j);
+                    x = x - dt * u;
+                    y = y - dt * v;
+                    u = this.sampleField(x, y, U_FIELD);
+                    this.newU[i * n + j] = u;
+                }
+                // Advect vertical velocity
+                if (this.s[i * n + j] != 0.0 && this.s[i * n + j - 1] != 0.0 && i < this.numX - 1) {
+                    let x = i * h + h2;
+                    let y = j * h;
+                    let u = this.avgU(i, j);
+                    let v = this.v[i * n + j];
+                    x = x - dt * u;
+                    y = y - dt * v;
+                    v = this.sampleField(x, y, V_FIELD);
+                    this.newV[i * n + j] = v;
+                }
+            }
+        }
+
+        this.u.set(this.newU);
+        this.v.set(this.newV);
+    }
+
+    advectSmoke(dt) {
+        // Semi-Lagrangian advection of smoke density
+        this.newM.set(this.m);
+        const n = this.numY;
+        const h = this.h;
+        const h2 = 0.5 * h;
+
+        for (let i = 1; i < this.numX - 1; i++) {
+            for (let j = 1; j < this.numY - 1; j++) {
+                if (this.s[i * n + j] != 0.0) {
+                    const u = (this.u[i * n + j] + this.u[(i + 1) * n + j]) * 0.5;
+                    const v = (this.v[i * n + j] + this.v[i * n + j + 1]) * 0.5;
+                    const x = i * h + h2 - dt * u;
+                    const y = j * h + h2 - dt * v;
+                    this.newM[i * n + j] = this.sampleField(x, y, S_FIELD);
+                }
+            }
+        }
+
+        this.m.set(this.newM);
+    }
+
+    simulate(dt, maxIters) {
+        // Main simulation step
+        this.p.fill(0.0); // Reset pressure
+        this.solveIncomp(dt, maxIters);
+        this.applyBoundaryConditions();
+        this.advectVel(dt);
+        this.advectSmoke(dt);
+    }
+}
+
+const scene = {
+    dt: 1.0 / 60.0,
+    maxIters: 50,
+    frameNum: 0,
+    overRelaxation: 1.75,
+    obstacleRadius: 0.1,
+    obstacleX: 0.6,
+    obstacleY: 0.05,
+    paused: false,
+    showStreamlines: false,
+    showPressure: false,
+    showSmoke: true,
+    hiRes: false,
+    fluid: null
+};
+
+function setupScene() {
+    let res;
+    if (scene.hiRes) {
+        res = 240;
+        scene.dt = 1.0 / 180.0;
+    } else {
+        res = 80;
+    }
+    const domainHeight = 1.0;
+    const domainWidth = domainHeight / simHeight * simWidth;
+    const h = domainHeight / res;
+    const numX = Math.floor(domainWidth / h);
+    const numY = Math.floor(domainHeight / h);
+    const density = 998.0;
+    const f = scene.fluid = new Fluid(numX, numY, h, density);
+    const n = f.numY;
+    scene.windVel = document.getElementById('windValue').textContent;
+
+    for (let i = 0; i < f.numX; i++) {
+        for (let j = 0; j < f.numY; j++) {
+            let s = 1.0;
+            if (i == 0 || j == 0 || j == f.numY - 1)
+                s = 0.0;
+            f.s[i * n + j] = s;
+            if (i == 1) {
+                f.u[i * n + j] = scene.windVel;
+            }
+        }
+    }
+
+    const smokeWidth = 0.18 * f.numY;
+    const smokeOffset = -0.35;
+    const minJ = Math.floor((0.5 + smokeOffset) * f.numY - 0.5 * smokeWidth);
+    const maxJ = Math.floor((0.5 + smokeOffset) * f.numY + 0.5 * smokeWidth);
+    for (let j = minJ; j < maxJ; j++)
+        f.m[j] = 0.0;
+
+    setObstacle(scene.obstacleX, scene.obstacleY, true);
+
+    document.getElementById("streamButton").checked = scene.showStreamlines;
+    document.getElementById("pressureButton").checked = scene.showPressure;
+    document.getElementById("smokeButton").checked = scene.showSmoke;
+    document.getElementById("overrelaxButton").checked = scene.overRelaxation > 1.0;
+    document.getElementById("hiResButton").checked = scene.hiRes;
+}
+// -------------------------Color Style-----------------------------
+function setColor(r, g, b) {
+    ctx.fillStyle = `rgb(
+    ${Math.floor(255*r)},
+    ${Math.floor(255*g)},
+    ${Math.floor(255*b)})`
+
+    ctx.strokeStyle = `rgb(
+    ${Math.floor(255*r)},
+    ${Math.floor(255*g)},
+    ${Math.floor(255*b)})`
+}
+
+function getSciColor(val, minVal, maxVal) {
+    // Normalize field values to a range of [0,1]
+    val = Math.min(Math.max(val, minVal), maxVal - Number.EPSILON);
+    let d = maxVal - minVal;
+    val = d == 0.0 ? 0.5 : (val - minVal) / d;
+
+    // Color into 4 segments
+    const segmentSize = 0.25;
+    const segmentIndex = Math.floor(val / segmentSize);
+    const segmentPosition = (val - segmentIndex * segmentSize) / segmentSize;
+    let color = {
+        r: 0,
+        g: 0,
+        b: 0
+    };
+
+    switch (segmentIndex) {
+        case 0:
+            color.r = 0.0;
+            color.g = segmentPosition;
+            color.b = 1.0;
+            break;
+        case 1:
+            color.r = 0.0;
+            color.g = 1.0;
+            color.b = 1.0 - segmentPosition;
+            break;
+        case 2:
+            color.r = segmentPosition;
+            color.g = 1.0;
+            color.b = 0.0;
+            break;
+        case 3:
+            color.r = 1.0;
+            color.g = 1.0 - segmentPosition;
+            color.b = 0.0;
+            break;
+    }
+
+    return [255 * color.r, 255 * color.g, 255 * color.b, 255]
+}
+
+// ----------------- Coordinate Conversion ---------------------------
+function cX(x) {
+    return x * cScale;
+}
+
+function cY(y) {
+    return canvas.height - y * cScale;
+}
+
+// ----------------- Map Sims Data onto Canvas ------------------------
+function map() {
+    // Clear the canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#DDDDDD";
+    f = scene.fluid;
+    n = f.numY;
+
+    // Adjust cell scale based on resolution
+    const cellScale = scene.hiRes ? 3.3 : 1.1;
+
+    const h = f.h;
+
+    // Calculate pressure range
+    minP = f.p[0];
+    maxP = f.p[0];
+    for (let i = 0; i < f.numCells; i++) {
+        minP = Math.min(minP, f.p[i]);
+        maxP = Math.max(maxP, f.p[i]);
+    }
+
+    // Get image data for pixel manipulation
+    imgdata = ctx.getImageData(0, 0, canvas.width, canvas.height)
+
+    let color = [255, 255, 255, 255]
+
+    // Main loop for drawing fluid cells
+    for (let i = 0; i < f.numX; i++) {
+        for (let j = 0; j < f.numY; j++) {
+            // Determine cell color based on visualization mode
+            if (scene.showPressure) {
+                const p = f.p[i * n + j];
+                const s = f.m[i * n + j];
+                color = getSciColor(p, minP, maxP);
+                if (scene.showSmoke) {
+                    // Blend pressure color with smoke
+                    color[0] = Math.max(0.0, color[0] - 255 * s);
+                    color[1] = Math.max(0.0, color[1] - 255 * s);
+                    color[2] = Math.max(0.0, color[2] - 255 * s);
+                }
+            } else if (scene.showSmoke) {
+                // Show smoke density
+                const s = f.m[i * n + j];
+                color[0] = color[1] = color[2] = 255 * s;
+            } else if (f.s[i * n + j] == 0.0) {
+                // Color for solid cells
+                color[0] = color[1] = color[2] = 0;
+            }
+
+            // Calculate pixel position and size for the cell
+            const x = Math.floor(cX(i * h));
+            const y = Math.floor(cY((j + 1) * h));
+            const cx = Math.floor(cScale * cellScale * h) + 1;
+            const cy = Math.floor(cScale * cellScale * h) + 1;
+
+            // Draw the cell pixel by pixel
+            for (let yi = y; yi < y + cy; yi++) {
+                let p = 4 * (yi * canvas.width + x)
+                for (let xi = 0; xi < cx; xi++) {
+                    imgdata.data[p++] = color[0];
+                    imgdata.data[p++] = color[1];
+                    imgdata.data[p++] = color[2];
+                    imgdata.data[p++] = 255; // Alpha Value
+                }
+            }
+        }
+    }
+
+    // Apply the pixel data to the canvas
+    ctx.putImageData(imgdata, 0, 0);
+
+    // Draw streamlines if enabled
+    if (scene.showStreamlines) {
+        const numSegs = 15;
+        const lenSegs = 0.0075;
+        ctx.strokeStyle = "#000000";
+
+        // Adjust streamline density based on resolution
+        const streamlineStep = scene.hiRes ? 15 : 5;
+
+        // Loop through grid to draw streamlines
+        for (let i = 1; i < f.numX - 1; i += streamlineStep) {
+            for (let j = 1; j < f.numY - 1; j += streamlineStep) {
+                let x = (i + 0.5) * f.h;
+                let y = (j + 0.5) * f.h;
+
+                ctx.beginPath();
+                ctx.moveTo(cX(x), cY(y));
+
+                // Draw individual streamline
+                for (let n = 0; n < numSegs; n++) {
+                    let u = f.sampleField(x, y, U_FIELD);
+                    let v = f.sampleField(x, y, V_FIELD);
+                    l = Math.sqrt(u * u + v * v);
+                    x += u * lenSegs;
+                    y += v * lenSegs;
+                    if (x > f.numX * f.h)
+                        break;
+
+                    ctx.lineTo(cX(x), cY(y));
+                }
+                ctx.stroke();
+            }
+        }
+    }
+
+
+
+    // Display pressure range if pressure visualization is enabled
+    if (scene.showPressure) {
+        const s = "Pressure: " + minP.toFixed(1) + " - " + maxP.toFixed(1) + " Pa";
+        ctx.fillStyle = scene.showSmoke ? "#FFFFFF" : "#000000";
+        ctx.font = "16px Times New Roman";
+        ctx.fillText(s, 10, 35);
+    }
+}
+
+function drawObstacle() {
+
+    let bottomCorrection = scene.hiRes ? 1 : 0.2;
+
+    r = scene.obstacleRadius + f.h;
+    ctx.fillStyle = scene.showPressure ? "#000000" : "#BBBBBB";
+    ctx.beginPath();
+    ctx.arc(cX(scene.obstacleX), cY(scene.obstacleY), cScale * r, Math.PI, 2.0 * Math.PI);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.lineWidth = 4.0;
+    ctx.strokeStyle = "#000000";
+    ctx.beginPath();
+    ctx.arc(cX(scene.obstacleX), cY(scene.obstacleY), cScale * r, Math.PI, 2.0 * Math.PI);
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.lineWidth = 8.0;
+    ctx.beginPath();
+    ctx.moveTo(cX(scene.obstacleX - r), cY(scene.obstacleY + bottomCorrection * f.h));
+    ctx.lineTo(cX(scene.obstacleX + r), cY(scene.obstacleY + bottomCorrection * f.h));
+    ctx.stroke();
+
+    ctx.lineWidth = 1.0;
+}
+
+function setObstacle(x, y, reset) {
+
+    let vx = 0.0;
+    let vy = 0.0;
+
+    if (!reset) {
+        vx = (x - scene.obstacleX) / scene.dt;
+        vy = (y - scene.obstacleY) / scene.dt;
+    }
+
+    scene.obstacleX = x;
+    scene.obstacleY = y;
+    const r = scene.obstacleRadius;
+    const f = scene.fluid;
+    const n = f.numY;
+
+
+    for (let i = 1; i < f.numX - 2; i++) {
+        for (let j = 1; j < f.numY - 2; j++) {
+
+            f.s[i * n + j] = 1.0;
+
+            dx = (i + 0.5) * f.h - x;
+            dy = (j + 0.5) * f.h - y;
+
+            // Half circle, downwards facing
+            if (dx * dx + dy * dy < r * r && dy > 0) {
+                f.s[i * n + j] = 0.0;
+                f.m[i * n + j] = 1.0;
+                f.u[i * n + j] = vx;
+                f.u[(i + 1) * n + j] = vx;
+                f.v[i * n + j] = vy;
+                f.v[i * n + j + 1] = vy;
+            }
+        }
+    }
+}
+
+// Interactions ------------------------------------------
+let mouseDown = false;
+
+function startDrag(x, y) {
+    let bounds = canvas.getBoundingClientRect();
+
+    let mx = x - bounds.left - canvas.clientLeft;
+    let my = y - bounds.top - canvas.clientTop;
+    mouseDown = true;
+
+    x = mx / cScale;
+    y = (canvas.height - my) / cScale;
+
+    setObstacle(x, y, true);
+}
+
+function drag(x, y) {
+    if (mouseDown) {
+        let bounds = canvas.getBoundingClientRect();
+        let mx = x - bounds.left - canvas.clientLeft;
+        let my = y - bounds.top - canvas.clientTop;
+        x = mx / cScale;
+        y = (canvas.height - my) / cScale;
+        setObstacle(x, y, false);
+    }
+}
+
+function endDrag() {
+    mouseDown = false;
+}
+
+canvas.addEventListener('mousedown', event => {
+    startDrag(event.x, event.y);
+});
+
+canvas.addEventListener('mouseup', event => {
+    endDrag();
+});
+
+canvas.addEventListener('mousemove', event => {
+    drag(event.x, event.y);
+});
+
+canvas.addEventListener('touchstart', event => {
+    startDrag(event.touches[0].clientX, event.touches[0].clientY)
+});
+
+canvas.addEventListener('touchend', event => {
+    endDrag()
+});
+
+canvas.addEventListener('touchmove', event => {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    drag(event.touches[0].clientX, event.touches[0].clientY)
+}, {
+    passive: false
+});
+
+function togglePause() {
+    let button = document.getElementById('pauseButton');
+    if (scene.paused)
+        button.innerHTML = "Pause";
+    else
+        button.innerHTML = "Resume";
+    scene.paused = !scene.paused;
+}
+
+function stepMotion() {
+    scene.paused = false;
+    simulate();
+    scene.paused = true;
+}
+
+// Main --------------------------------------------------
+function simulate() {
+    if (!scene.paused)
+        scene.fluid.simulate(scene.dt, scene.maxIters)
+    scene.frameNum++;
+}
+
+function update() {
+    simulate();
+    map();
+    drawObstacle();
+    requestAnimationFrame(update);
+}
+
+function init() {
+    setupScene();
+
+    try {
+        // Radius slider setup
+        scene.obstacleRadius = parseFloat(radiusSlider.value);
+        radiusValue.textContent = scene.obstacleRadius;
+
+        radiusSlider.addEventListener('input', function() {
+            scene.obstacleRadius = parseFloat(this.value);
+            radiusValue.textContent = this.value;
+            setObstacle(scene.obstacleX, scene.obstacleY, true);
+        });
+
+        // Wind slider setup
+        windSlider.addEventListener('input', function() {
+            scene.windVel = parseFloat(windSlider.value);
+            windValue.textContent = scene.windVel;
+
+            // Update the fluid simulation with new wind velocity
+            for (let j = 0; j < scene.fluid.numY; j++) {
+                scene.fluid.u[scene.fluid.numY + j] = scene.windVel;
+            }
+        });
+
+        // HiRes checkbox setup
+        let hiResButton = document.getElementById('hiResButton');
+        hiResButton.checked = scene.hiRes;
+
+        hiResButton.addEventListener('change', function() {
+            scene.hiRes = this.checked;
+            setupScene();
+        });
+
+        // Initial update to ensure everything is drawn
+        update();
+
+    } catch (error) {
+        console.error("Error setting up UI controls:", error);
+    }
+}
+
+init();

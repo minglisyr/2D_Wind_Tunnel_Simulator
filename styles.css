@@ -1,0 +1,65 @@
+body {
+    font-family: verdana;
+    font-size: 15px;
+}
+
+.button {
+    background-color: #606060;
+    border: none;
+    color: white;
+    padding: 10px 10px;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    width: 100px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.buttonlong {
+    background-color: #606060;
+    border: none;
+    color: white;
+    padding: 10px 10px;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    width: 150px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 80px;
+    height: 6px;
+    border-radius: 5px;
+    background: #dddddd;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.red-text {
+    color: red;
+}
+
+
+input[type="range"] {
+    margin-left: 50px;
+}
+
+#radiusSlider {
+    margin-left: 100px;
+}
+
+
+#myCanvas {
+    border: 3px solid;
+}

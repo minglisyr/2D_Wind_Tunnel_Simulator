@@ -227,7 +227,7 @@ const scene = {
     dt: 1.0 / 60.0,
     maxIters: 50,
     frameNum: 0,
-    overRelaxation: 1.75,
+    overRelaxation: 1.9,
     obstacleRadius: 0.1,
     obstacleX: 0.6,
     obstacleY: 0.05,

@@ -15,8 +15,6 @@ const U_FIELD = 1;
 const V_FIELD = 2;
 const S_FIELD = 9;
 
-let counter = 0;
-
 // ----------------- Fluid core algorithm ------------------------------
 
 class Fluid {
@@ -36,17 +34,17 @@ class Fluid {
 
         this.p = new Float32Array(this.numCells);
         this.s = new Float32Array(this.numCells);
-        this.m = new Float32Array(this.numCells);
-        this.newM = new Float32Array(this.numCells);
-        
-        this.m.fill(1.0); // Initialize smoke density to 1.0 everywhere
+        this.smo = new Float32Array(this.numCells);
+        this.newSMO = new Float32Array(this.numCells);
+
+        this.smo.fill(1.0); // Initialize smoke density to 1.0 everywhere
     }
 
     solveIncomp(dt, maxIters) {
         const n = this.numY;
         const cp = this.density * this.h / dt; // Pressure coefficient
 
-        // Iterate to solve for pressure and enforce incompressibility
+        // Jacobian iteration to solve for pressure and enforce incompressibility
         for (let iter = 0; iter < maxIters; iter++) {
             for (let i = 1; i < this.numX - 1; i++) {
                 for (let j = 1; j < this.numY - 1; j++) {
@@ -77,8 +75,8 @@ class Fluid {
         }
     }
 
-    sampleField(x, y, field) {
-        // Bilinear interpolation to sample field at given (x, y) position
+    fieldCalc(x, y, field) {
+        // Bilinear interpolation to field calculation at given (x, y) position
         const n = this.numY;
         const h = this.h;
         const h1 = 1.0 / h;
@@ -101,7 +99,7 @@ class Fluid {
                 dx = h2;
                 break;
             case S_FIELD:
-                f = this.m;
+                f = this.smo;
                 dx = h2;
                 dy = h2;
                 break;
@@ -170,7 +168,7 @@ class Fluid {
                     let v = this.avgV(i, j);
                     x = x - dt * u;
                     y = y - dt * v;
-                    u = this.sampleField(x, y, U_FIELD);
+                    u = this.fieldCalc(x, y, U_FIELD);
                     this.newU[i * n + j] = u;
                 }
                 // Advect vertical velocity
@@ -181,7 +179,7 @@ class Fluid {
                     let v = this.v[i * n + j];
                     x = x - dt * u;
                     y = y - dt * v;
-                    v = this.sampleField(x, y, V_FIELD);
+                    v = this.fieldCalc(x, y, V_FIELD);
                     this.newV[i * n + j] = v;
                 }
             }
@@ -193,7 +191,7 @@ class Fluid {
 
     advectSmoke(dt) {
         // Semi-Lagrangian advection of smoke density
-        this.newM.set(this.m);
+        this.newSMO.set(this.smo);
         const n = this.numY;
         const h = this.h;
         const h2 = 0.5 * h;
@@ -205,16 +203,15 @@ class Fluid {
                     const v = (this.v[i * n + j] + this.v[i * n + j + 1]) * 0.5;
                     const x = i * h + h2 - dt * u;
                     const y = j * h + h2 - dt * v;
-                    this.newM[i * n + j] = this.sampleField(x, y, S_FIELD);
+                    this.newSMO[i * n + j] = this.fieldCalc(x, y, S_FIELD);
                 }
             }
         }
 
-        this.m.set(this.newM);
+        this.smo.set(this.newSMO);
     }
 
     simulate(dt, maxIters) {
-        // Main simulation step
         this.p.fill(0.0); // Reset pressure
         this.solveIncomp(dt, maxIters);
         this.applyBoundaryConditions();
@@ -227,7 +224,7 @@ const scene = {
     dt: 1.0 / 60.0,
     maxIters: 50,
     frameNum: 0,
-    overRelaxation: 1.9,
+    overRelaxation: 1.75,
     obstacleRadius: 0.1,
     obstacleX: 0.6,
     obstacleY: 0.05,
@@ -255,8 +252,8 @@ function setupScene() {
     const density = 998.0;
     const f = scene.fluid = new Fluid(numX, numY, h, density);
     const n = f.numY;
-    scene.windVel = document.getElementById('windValue').textContent;
 
+    scene.windVel = document.getElementById('windValue').textContent;
     for (let i = 0; i < f.numX; i++) {
         for (let j = 0; j < f.numY; j++) {
             let s = 1.0;
@@ -274,14 +271,14 @@ function setupScene() {
     const minJ = Math.floor((0.5 + smokeOffset) * f.numY - 0.5 * smokeWidth);
     const maxJ = Math.floor((0.5 + smokeOffset) * f.numY + 0.5 * smokeWidth);
     for (let j = minJ; j < maxJ; j++)
-        f.m[j] = 0.0;
+        f.smo[j] = 0.0;
 
     setObstacle(scene.obstacleX, scene.obstacleY, true);
 
     document.getElementById("streamButton").checked = scene.showStreamlines;
     document.getElementById("pressureButton").checked = scene.showPressure;
     document.getElementById("smokeButton").checked = scene.showSmoke;
-    document.getElementById("overrelaxButton").checked = scene.overRelaxation > 1.0;
+    document.getElementById("overrelaxButton").checked = scene.overRelaxation;
     document.getElementById("hiResButton").checked = scene.hiRes;
 }
 // -------------------------Color Style-----------------------------
@@ -381,7 +378,7 @@ function map() {
             // Determine cell color based on visualization mode
             if (scene.showPressure) {
                 const p = f.p[i * n + j];
-                const s = f.m[i * n + j];
+                const s = f.smo[i * n + j];
                 color = getSciColor(p, minP, maxP);
                 if (scene.showSmoke) {
                     // Blend pressure color with smoke
@@ -391,7 +388,7 @@ function map() {
                 }
             } else if (scene.showSmoke) {
                 // Show smoke density
-                const s = f.m[i * n + j];
+                const s = f.smo[i * n + j];
                 color[0] = color[1] = color[2] = 255 * s;
             } else if (f.s[i * n + j] == 0.0) {
                 // Color for solid cells
@@ -406,12 +403,12 @@ function map() {
 
             // Draw the cell pixel by pixel
             for (let yi = y; yi < y + cy; yi++) {
-                let p = 4 * (yi * canvas.width + x)
+                let pixel = 4 * (yi * canvas.width + x)
                 for (let xi = 0; xi < cx; xi++) {
-                    imgdata.data[p++] = color[0];
-                    imgdata.data[p++] = color[1];
-                    imgdata.data[p++] = color[2];
-                    imgdata.data[p++] = 255; // Alpha Value
+                    imgdata.data[pixel++] = color[0];
+                    imgdata.data[pixel++] = color[1];
+                    imgdata.data[pixel++] = color[2];
+                    imgdata.data[pixel++] = 255; // Alpha Value
                 }
             }
         }
@@ -440,8 +437,8 @@ function map() {
 
                 // Draw individual streamline
                 for (let n = 0; n < numSegs; n++) {
-                    let u = f.sampleField(x, y, U_FIELD);
-                    let v = f.sampleField(x, y, V_FIELD);
+                    let u = f.fieldCalc(x, y, U_FIELD);
+                    let v = f.fieldCalc(x, y, V_FIELD);
                     l = Math.sqrt(u * u + v * v);
                     x += u * lenSegs;
                     y += v * lenSegs;
@@ -454,8 +451,6 @@ function map() {
             }
         }
     }
-
-
 
     // Display pressure range if pressure visualization is enabled
     if (scene.showPressure) {
@@ -521,7 +516,7 @@ function setObstacle(x, y, reset) {
             // Half circle, downwards facing
             if (dx * dx + dy * dy < r * r && dy > 0) {
                 f.s[i * n + j] = 0.0;
-                f.m[i * n + j] = 1.0;
+                f.smo[i * n + j] = 1.0;
                 f.u[i * n + j] = vx;
                 f.u[(i + 1) * n + j] = vx;
                 f.v[i * n + j] = vy;

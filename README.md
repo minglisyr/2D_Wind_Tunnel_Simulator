@@ -11,7 +11,7 @@
 
 ## Structure
 The 2D Wind Tunnel Simulator includes the following files:
-* `README`: this file
+* `README.md`: this file
 * `LICENSE`: the MIT License file
 * `index.html`: main page for Simulator User Interface with control buttons, visualization options and simulation parameters
 * `styles.css`: the file for Styling and User Interface Design 
@@ -113,9 +113,13 @@ The 2D Wind Tunnel Simulator includes the following files:
 14. Publish project to GitHub Pages or similar hosting service
 15. Create project showcase video and update README with link
 
+</div>
+
 ## Future Development:
 1. Complicated/User-defined Car-shape obstacle (obstacle detector with arbitary shapes)
 2. Multigrid solver for higher resolution implementation
+
+</div>
 
 ## References:
 1. [Chentanez, N., Muller, M. (2011). NVIDIA PhysX Research, Real-Time Eulerian Water Simulation Using a Restricted Tall Cell Grid](https://matthias-research.github.io/pages/publications/tallCells.pdf#:~:text=We%20present%20a%20new%20Eulerian%20fluid)

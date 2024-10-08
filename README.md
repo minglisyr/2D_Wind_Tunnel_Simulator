@@ -90,11 +90,11 @@ The 2D Wind Tunnel Simulator includes the following files:
 
   #### Initialization and UI Setup
   * `init()`: Initializes the simulation scene and configures the user interface controls, ensuring that the simulator is ready for user interaction.
-    * Modular Initialization: Separating the initialization into setupScene() and init() allows for easier maintenance and potential reuse of setup logic.
-    * Real-time UI Responsiveness: Event listeners are set up to respond immediately to user input, providing instant feedback and a more engaging user experience.
-    * Direct Simulation Updates: Changes in UI controls (like wind velocity) directly modify the simulation parameters, ensuring tight integration between the UI and the underlying physics model.
-    * Resolution Switching: The ability to switch between standard and high-resolution modes allows users to balance between performance and detail based on their hardware capabilities.
-    * Error Handling: The use of a try-catch block ensures that any errors during initialization are caught and logged, improving the robustness of the application.
+    * `Modular Initialization`: Separating the initialization into setupScene() and init() allows for easier maintenance and potential reuse of setup logic.
+    * `Real-time UI Responsiveness`: Event listeners are set up to respond immediately to user input, providing instant feedback and a more engaging user experience.
+    * `Direct Simulation Updates`: Changes in UI controls (like wind velocity) directly modify the simulation parameters, ensuring tight integration between the UI and the underlying physics model.
+    * `Resolution Switching`: The ability to switch between standard and high-resolution modes allows users to balance between performance and detail based on their hardware capabilities.
+    * `Error Handling`: The use of a try-catch block ensures that any errors during initialization are caught and logged, improving the robustness of the application.
   ##### Remarks
   The init() function sets the stage for user exploration and learning by ensuring that all components of the simulator – from the underlying physics model to the user interface controls – are properly initialized and interconnected. This careful setup is key to making complex fluid dynamics concepts accessible and engaging to users, regardless of their technical background.
 
@@ -123,7 +123,7 @@ The 2D Wind Tunnel Simulator includes the following files:
 2. User-defined obstacle
 3. Multigrid solver for higher resolution implementation
 
-References:
+## References:
 1. [Chentanez, N., Muller, M. (2011). NVIDIA PhysX Research, Real-Time Eulerian Water Simulation Using a Restricted Tall Cell Grid](https://matthias-research.github.io/pages/publications/tallCells.pdf#:~:text=We%20present%20a%20new%20Eulerian%20fluid)
 2. [Chentanez, N., Muller, M. (2011). NVIDIA, Real-Time Eulerian Water Simulation Using a Restricted Tall Cell Grid, SIGGRAPH2011](https://matthias-research.github.io/pages/publications/tallCellsSlides.pdf#:~:text=%E2%80%A2%20GPU%20friendly%20tall%20cell%20grid)
 3. [Ash, M., (2006). Fluid Simulation for Dummies](https://mikeash.com/pyblog/fluid-simulation-for-dummies.html#:~:text=With%20that%20goal%20in%20mind,%20I'm#:~:text=With%20that%20goal%20in%20mind,%20I'm)

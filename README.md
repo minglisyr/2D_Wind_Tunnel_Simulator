@@ -16,7 +16,7 @@
 The 2D Wind Tunnel Simulator includes the following files:
 * `README.md`: this file
 * `LICENSE`: the MIT License file
-* `index.html`: main page for Simulator User Interface with control buttons, visualization options and simulation parameters
+* `index.html`: the Simulator User Interface with control buttons, visualization options and simulation parameters
 * `styles.css`: the file for Styling and User Interface Design 
 * `windtunnel.js`: the javascript file for Fluid Solver, Visualization and Interactive Control
   

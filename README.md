@@ -8,6 +8,7 @@
 3. Interactive flow field display
 
 </div>
+
 ## Structure
 The 2D Wind Tunnel Simulator includes the following files:
 * `README`: this file
@@ -15,6 +16,7 @@ The 2D Wind Tunnel Simulator includes the following files:
 * `index.html`: main page for Simulator User Interface with control buttons, visualization options and simulation parameters
 * `styles.css`: the file for Styling and User Interface Design 
 * `windtunnel.js`: the javascript file for Fluid Solver, Visualization and Interactive Control
+  
 </div>
 
 ## Fluid Simulation Core `windtunnel.js`

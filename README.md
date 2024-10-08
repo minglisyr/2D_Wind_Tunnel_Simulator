@@ -2,7 +2,7 @@
 #### Video Demo:  <URL HERE>
 #### Description: The Web-based 2D Wind Tunnel Simulator is an interactive educational tool designed to simulate airflow around a simplified car (half circle) in a two-dimensional environment. This project aims to provide students, engineers, and aerodynamics enthusiasts with a user-friendly platform to visualize and understand fluid dynamics principles without the need for complex physical setups or expensive software.
 
-![Demo](https://github.com/minglisyr/2D_Wind_Tunnel_Simulator/demo.gif)
+![Demo](https://github.com/minglisyr/2D_Wind_Tunnel_Simulator/Demo.gif)
 
 ## Key features of the simulator include:
 1. Visualization of airflow patterns

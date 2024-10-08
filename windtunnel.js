@@ -236,7 +236,9 @@ const scene = {
     fluid: null
 };
 
+// -------------------------Canvas Creation-----------------------------
 function setupScene() {
+    // Initialize simulation parameters and canvas settings
     let res;
     if (scene.hiRes) {
         res = 240;
@@ -253,6 +255,7 @@ function setupScene() {
     const f = scene.fluid = new Fluid(numX, numY, h, density);
     const n = f.numY;
 
+    // Set up inflow winds
     scene.windVel = document.getElementById('windValue').textContent;
     for (let i = 0; i < f.numX; i++) {
         for (let j = 0; j < f.numY; j++) {
@@ -266,6 +269,7 @@ function setupScene() {
         }
     }
 
+    // Set up smoke strip
     const smokeWidth = 0.18 * f.numY;
     const smokeOffset = -0.35;
     const minJ = Math.floor((0.5 + smokeOffset) * f.numY - 0.5 * smokeWidth);
@@ -275,26 +279,16 @@ function setupScene() {
 
     setObstacle(scene.obstacleX, scene.obstacleY, true);
 
+    // UI sync
     document.getElementById("streamButton").checked = scene.showStreamlines;
     document.getElementById("pressureButton").checked = scene.showPressure;
     document.getElementById("smokeButton").checked = scene.showSmoke;
     document.getElementById("overrelaxButton").checked = scene.overRelaxation;
     document.getElementById("hiResButton").checked = scene.hiRes;
 }
+
 // -------------------------Color Style-----------------------------
-function setColor(r, g, b) {
-    ctx.fillStyle = `rgb(
-    ${Math.floor(255*r)},
-    ${Math.floor(255*g)},
-    ${Math.floor(255*b)})`
-
-    ctx.strokeStyle = `rgb(
-    ${Math.floor(255*r)},
-    ${Math.floor(255*g)},
-    ${Math.floor(255*b)})`
-}
-
-function getSciColor(val, minVal, maxVal) {
+function getSciColor(val, minVal, maxVal) {    
     // Normalize field values to a range of [0,1]
     val = Math.min(Math.max(val, minVal), maxVal - Number.EPSILON);
     let d = maxVal - minVal;

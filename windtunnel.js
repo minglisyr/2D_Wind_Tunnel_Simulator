@@ -15,8 +15,7 @@ const U_FIELD = 1;
 const V_FIELD = 2;
 const S_FIELD = 9;
 
-// ----------------- Fluid core algorithm ------------------------------
-
+// ----------------- Fluid Core Algorithm ------------------------------
 class Fluid {
     constructor(numX, numY, h, density) {
         // Initialize fluid properties
@@ -57,7 +56,6 @@ class Fluid {
                     const sy1 = this.s[i * n + j + 1];
                     const s = sx0 + sx1 + sy0 + sy1;
                     if (s == 0.0) continue;
-
                     const div = this.u[(i + 1) * n + j] - this.u[i * n + j] + this.v[i * n + j + 1] - this.v[i * n + j];
 
                     // Calculate pressure correction
@@ -174,7 +172,6 @@ class Fluid {
                 }
             }
         }
-
         this.u.set(this.newU);
         this.v.set(this.newV);
     }
@@ -197,7 +194,6 @@ class Fluid {
                 }
             }
         }
-
         this.smo.set(this.newSMO);
     }
 
@@ -293,7 +289,6 @@ function getSciColor(val, minVal, maxVal) {
         g: 0,
         b: 0
     };
-
     switch (segmentIndex) {
         case 0:
             color.r = 0.0;
@@ -332,16 +327,12 @@ function cY(y) {
 function map() {
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     ctx.fillStyle = "#DDDDDD";
     f = scene.fluid;
-    n = f.numY;
-
-    // Adjust cell scale based on resolution
-    const cellScale = scene.hiRes ? 3.3 : 1.1;
-
-    const h = f.h;
-
+    const n = f.numY;
+    const h = f.h;    
+    const cellScale = scene.hiRes ? 3.3 : 1.1; // Adjust cell scale based on resolution
+    
     // Calculate pressure range
     minP = f.p[0];
     maxP = f.p[0];
@@ -352,7 +343,6 @@ function map() {
 
     // Get image data for pixel manipulation
     imgdata = ctx.getImageData(0, 0, canvas.width, canvas.height)
-
     let color = [255, 255, 255, 255]
 
     // Main loop for drawing fluid cells
@@ -373,9 +363,8 @@ function map() {
                 // Show smoke density
                 const s = f.smo[i * n + j];
                 color[0] = color[1] = color[2] = 255 * s;
-            } else if (f.s[i * n + j] == 0.0) {
-                // Color for solid cells
-                color[0] = color[1] = color[2] = 0;
+            } else if (f.s[i * n + j] == 0.0) {                
+                color[0] = color[1] = color[2] = 0; // Color for solid cells
             }
 
             // Calculate pixel position and size for the cell
@@ -395,19 +384,15 @@ function map() {
                 }
             }
         }
-    }
-
-    // Apply the pixel data to the canvas
-    ctx.putImageData(imgdata, 0, 0);
+    }    
+    ctx.putImageData(imgdata, 0, 0); // Apply the pixel data to the canvas
 
     // Draw streamlines if enabled
     if (scene.showStreamlines) {
         const numSegs = 15;
         const lenSegs = 0.0075;
-        ctx.strokeStyle = "#000000";
-
-        // Adjust streamline density based on resolution
-        const streamlineStep = scene.hiRes ? 15 : 5;
+        ctx.strokeStyle = "#000000";      
+        const streamlineStep = scene.hiRes ? 15 : 5; // Adjust streamline density based on resolution
 
         // Loop through grid to draw streamlines
         for (let i = 1; i < f.numX - 1; i += streamlineStep) {
@@ -470,27 +455,22 @@ function drawObstacle() {
 }
 
 function setObstacle(x, y, reset) {
-
     let vx = 0.0;
     let vy = 0.0;
-
+    
     if (!reset) {
         vx = (x - scene.obstacleX) / scene.dt;
         vy = (y - scene.obstacleY) / scene.dt;
     }
-
     scene.obstacleX = x;
     scene.obstacleY = y;
     const r = scene.obstacleRadius;
     const f = scene.fluid;
     const n = f.numY;
 
-
     for (let i = 1; i < f.numX - 2; i++) {
         for (let j = 1; j < f.numY - 2; j++) {
-
             f.s[i * n + j] = 1.0;
-
             dx = (i + 0.5) * f.h - x;
             dy = (j + 0.5) * f.h - y;
 
@@ -512,14 +492,11 @@ let mouseDown = false;
 
 function startDrag(x, y) {
     let bounds = canvas.getBoundingClientRect();
-
     let mx = x - bounds.left - canvas.clientLeft;
     let my = y - bounds.top - canvas.clientTop;
     mouseDown = true;
-
     x = mx / cScale;
     y = (canvas.height - my) / cScale;
-
     setObstacle(x, y, true);
 }
 
@@ -597,7 +574,6 @@ function update() {
 
 function init() {
     setupScene();
-
     try {
         // Radius slider setup
         scene.obstacleRadius = parseFloat(radiusSlider.value);
@@ -628,9 +604,8 @@ function init() {
             scene.hiRes = this.checked;
             setupScene();
         });
-
-        // Initial update to ensure everything is drawn
-        update();
+        
+        update(); // Initial update to ensure everything is drawn
 
     } catch (error) {
         console.error("Error setting up UI controls:", error);

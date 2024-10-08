@@ -50,7 +50,7 @@ The 2D Wind Tunnel Simulator includes the following files:
     * `UI Synchronization`: Ensures that the UI controls reflect the current simulation settings.
 
   #### Color Management and Visualization
-  * `setColor(r, g, b)`: Converts normalized RGB values (0-1) to the 0-255 range. Sets both the fill and stroke styles of the canvas context to the specified color.
+  
   * `getSciColor(val, minVal, maxVal)`: Implements a scientific color map for visualizing scalar fields (like pressure or velocity magnitude).
     * `Color Mapping Process`:  Normalize the input value to a range of [0,1] → Divide the color spectrum into four segments → Determine which segment the normalized value falls into → Interpolate the color within that segment
     * `Color Scheme`: Blue (0.0) → Cyan (0.25) → Green (0.5) → Yellow (0.75) → Red (1.0)

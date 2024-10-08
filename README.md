@@ -77,16 +77,11 @@ The 2D Wind Tunnel Simulator includes the following files:
     * Adds a bottom line to complete the car silhouette.
 
   #### User Interaction and Simulation Control
-  ##### Mouse Interaction
-  * `startDrag(x, y)`
-  * `drag(x, y)`
-  * `endDrag()`
-  ##### Simulation Control
-  * `togglePause()`: Pause/Resume button
-  * `stepMotion()`: Step Forward button
-  ##### Main Simulation Loop
-  * `simulate()`
-  * `update()`
+| Mouse Interaction         | Simulation Control     | Main Simulation Loop |
+|--------------|-----------|------------|
+| startDrag(x, y) | togglePause( )      | simulate( )        |
+| drag(x, y)      | stepMotion( )  | update( )       |
+| endDrag( )       |   |        |
 
   #### Initialization and UI Setup
   * `init()`: Initializes the simulation scene and configures the user interface controls, ensuring that the simulator is ready for user interaction.
@@ -101,7 +96,7 @@ The 2D Wind Tunnel Simulator includes the following files:
 
 </div>
 
-## TODO List:
+## TODO List (for CS50x):
 1. Create basic file structure (HTML, CSS, JavaScript)
 2. Design main layout
 3. Create responsive grid for simulation area
@@ -119,9 +114,8 @@ The 2D Wind Tunnel Simulator includes the following files:
 15. Create project showcase video and update README with link
 
 ## Future Development:
-1. Complicated Car-shape obstacle (obstacle detector with arbitary shapes)
-2. User-defined obstacle
-3. Multigrid solver for higher resolution implementation
+1. Complicated/User-defined Car-shape obstacle (obstacle detector with arbitary shapes)
+2. Multigrid solver for higher resolution implementation
 
 ## References:
 1. [Chentanez, N., Muller, M. (2011). NVIDIA PhysX Research, Real-Time Eulerian Water Simulation Using a Restricted Tall Cell Grid](https://matthias-research.github.io/pages/publications/tallCells.pdf#:~:text=We%20present%20a%20new%20Eulerian%20fluid)

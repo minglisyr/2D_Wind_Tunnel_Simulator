@@ -49,10 +49,7 @@ The 2D Wind Tunnel Simulator includes the following files:
 #### Color Management and Visualization
 * `setColor(r, g, b)`: Converts normalized RGB values (0-1) to the 0-255 range. Sets both the fill and stroke styles of the canvas context to the specified color.
 * `getSciColor(val, minVal, maxVal)`: Implements a scientific color map for visualizing scalar fields (like pressure or velocity magnitude). Maps a value within a given range to a color using a four-segment color gradient.
-  * `Color Mapping Process`: 1. Normalizes the input value to a range of [0,1].
-                             2. Divides the color spectrum into four segments.
-                             3. Determines which segment the normalized value falls into.
-                             4. Interpolates the color within that segment.
+  * `Color Mapping Process`: 1) Normalizes the input value to a range of [0,1]. 2) Divides the color spectrum into four segments. 3) Determines which segment the normalized value falls into. 4) Interpolates the color within that segment.
   * `Color Scheme`: Blue (0.0) → Cyan (0.25) → Green (0.5) → Yellow (0.75) → Red (1.0)
 
 #### Coordinate Conversion

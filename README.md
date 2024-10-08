@@ -8,7 +8,6 @@
 3. Interactive flow field display
 
 </div>
-
 ## Structure
 The 2D Wind Tunnel Simulator includes the following files:
 * `README`: this file
@@ -17,35 +16,9 @@ The 2D Wind Tunnel Simulator includes the following files:
 * `styles.css`: the file for Styling and User Interface Design 
 * `windtunnel.js`: the javascript file for Fluid Solver, Visualization and Interactive Control
 </div>
-# User Interface
-The Web-based 2D Wind Tunnel Simulator features an interactive HTML-based user interface that allows users to control various aspects of the simulation. Here's a breakdown of the key UI elements and their functions:
-# Control Buttons
-(Re)Start Button: Initializes or restarts the simulation.
-Pause Button: Toggles the pause state of the simulation.
-Step Forward Button: Advances the simulation by one step when paused.
-# Visualization Options
-The interface provides several checkboxes to toggle different visualization features:
-Streamlines: Enables/disables the display of streamlines in the simulation.
-Pressure: Toggles the visualization of pressure distribution.
-Smoke: Enables/disables the smoke visualization for better flow tracking.
-Over-Relaxation: Toggles an over-relaxation technique for potentially faster convergence.
-High Resolution: Switches between standard and high-resolution simulation modes.
-# Simulation Parameters
-Two slider inputs allow users to adjust key parameters of the simulation:
-Obstacle Radius: Adjusts the size of the simulated car (half-circle obstacle).
-Wind Speed: Controls the speed of the simulated wind in the tunnel.
-# Design Choices
-Checkbox Toggles: We chose to use checkboxes for visualization options to allow users to easily toggle multiple features on or off, providing a flexible and intuitive interface.
-Slider Inputs: Sliders were implemented for adjusting the obstacle radius and wind speed. This design choice allows for smooth, continuous adjustment of these parameters, providing immediate visual feedback as users modify the simulation conditions.
-Step Forward Button: This feature was added to allow users to observe the simulation in fine detail, advancing frame-by-frame when paused. This is particularly useful for educational purposes, allowing careful examination of each step in the fluid dynamics process.
-High Resolution Toggle: The option to switch to high resolution was made distinct with a red label to indicate that it may impact performance. This design choice helps users make informed decisions about the trade-off between detail and performance.
-Canvas Element: The simulation itself is rendered on an HTML canvas element, providing a lightweight and widely-supported method for real-time graphics rendering in the browser.
-These design choices were made to create a user-friendly, interactive, and educational tool that balances functionality with performance, making complex fluid dynamics concepts accessible to a wide range of users.
 
-# Styling and User Interface Design
-The Web-based 2D Wind Tunnel Simulator employs careful styling choices to enhance user experience and maintain a clean, professional appearance. These styling choices were made with the goal of creating an interface that is not only functional but also visually appealing and intuitive to use. The clean, modern design supports the educational purpose of the tool by minimizing distractions and focusing user attention on the important elements of the simulation.
-
-# Fluid Simulation Core
+</div>
+## Fluid Simulation Core `windtunnel.js`
 The heart of our 2D Wind Tunnel Simulator is the Fluid class, which implements the core fluid dynamics simulation. This class uses a semi-Lagrangian method for advection and a Jacobi iteration method for pressure solving, providing a balance between accuracy and computational efficiency.
 Key Components
 ## Constructor

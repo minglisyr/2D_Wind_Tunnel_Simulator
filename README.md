@@ -36,8 +36,7 @@ The 2D Wind Tunnel Simulator includes the following files:
 * The `Staggered Grid` is used to store pressure at cell centers, and velocity components are stored on cell faces, which helps in reducing numerical instabilities and provides more accurate pressure gradient calculations.
 * The `Over-Relaxation` is used for faster convergence in the pressure solving step, at the cost of potential instability if set too high.
 
-</div>
-#### Core Algorithm of Fluid Simulator
+#### Setup Scence and Initialization
 * `setupScene()`: Initializes the fluid simulation domain, sets boundary conditions, and configures various simulation parameters.
   * `Resolution Setting`: Allows switching between high (240x240) and standard (80x80) resolution. Adjusts the time step for high-resolution mode to maintain stability.
   * `Domain Configuration`: Sets up the simulation domain based on the chosen resolution. Calculates the number of cells in X and Y directions to maintain the aspect ratio.
@@ -47,47 +46,16 @@ The 2D Wind Tunnel Simulator includes the following files:
   * `Obstacle Placement`: Places the obstacle (simulated car) in the wind tunnel.
   * `UI Synchronization`: Ensures that the UI controls reflect the current simulation settings.
 
-Ensures that the user interface accurately reflects the current state of the simulation, improving user experience and preventing confusion.
-This setup function demonstrates the careful balance between physical accuracy, computational efficiency, and user experience in creating an educational fluid dynamics simulation. It provides a solid foundation for the simulation while allowing for easy adjustments and extensions.
+#### Color Management and Visualization
+* `setColor(r, g, b)`: Converts normalized RGB values (0-1) to the 0-255 range. Sets both the fill and stroke styles of the canvas context to the specified color.
+* `getSciColor(val, minVal, maxVal)`: Implements a scientific color map for visualizing scalar fields (like pressure or velocity magnitude). Maps a value within a given range to a color using a four-segment color gradient.
+  * `Color Mapping Process`: 1. Normalizes the input value to a range of [0,1].
+                             2. Divides the color spectrum into four segments.
+                             3. Determines which segment the normalized value falls into.
+                             4. Interpolates the color within that segment.
+  * `Color Scheme`: Blue (0.0) → Cyan (0.25) → Green (0.5) → Yellow (0.75) → Red (1.0)
 
-
-# Color Management and Visualization
-Our 2D Wind Tunnel Simulator employs sophisticated color management techniques to provide clear and intuitive visual representations of the fluid dynamics data. Two key functions handle this aspect of the simulation:
-## setColor(r, g, b)
-Converts normalized RGB values (0-1) to the 0-255 range.
-Sets both the fill and stroke styles of the canvas context to the specified color.
-Design Choice:
-Using a single function to set both fill and stroke styles ensures consistency in color application across different drawing operations.
-The function accepts normalized RGB values, making it easier to work with color calculations in the simulation logic.
-## getSciColor(val, minVal, maxVal)
-Implements a scientific color map for visualizing scalar fields (like pressure or velocity magnitude).
-Maps a value within a given range to a color using a four-segment color gradient.
-## Color Mapping Process:
-Normalizes the input value to a range of [0,1].
-Divides the color spectrum into four segments.
-Determines which segment the normalized value falls into.
-Interpolates the color within that segment.
-## Color Scheme:
-Blue (0.0) → Cyan (0.25) → Green (0.5) → Yellow (0.75) → Red (1.0)
-Design Choices:
-Four-Segment Gradient:
-Provides a wide range of distinct colors, making it easier to discern small variations in the data.
-The chosen color progression is intuitive for most users (cool colors for low values, warm colors for high values).
-Normalization:
-Allows the function to work with any range of input values, making it versatile for different types of data (e.g., pressure, velocity).
-Clamping:
-Values outside the specified range are clamped to the nearest endpoint, preventing unexpected color outputs.
-RGBA Output:
-Returns color as an array of RGBA values (0-255 range), making it compatible with various drawing functions and allowing for alpha channel manipulation if needed.
-# Importance in the Simulation
-These color functions play a crucial role in making the simulation data visually comprehensible:
-Intuitive Data Representation: The scientific color map allows users to quickly understand the distribution and intensity of various fluid properties across the simulation domain.
-Enhanced Visual Feedback: By mapping data to colors, subtle changes in the fluid behavior become more apparent, enhancing the educational value of the simulation.
-Flexibility: The functions are designed to work with different types of data and visualization methods (e.g., pressure fields, velocity magnitudes, streamlines), providing a consistent visual language throughout the simulation.
-Performance Consideration: By pre-calculating colors based on data values, we can efficiently render large amounts of visual information without recalculating colors for each frame or pixel.
-These color management functions contribute significantly to the user experience and educational effectiveness of the 2D Wind Tunnel Simulator, turning complex numerical data into intuitive visual representations.
-
-# Coordinate Conversion
+#### Coordinate Conversion
 In our 2D Wind Tunnel Simulator, we need to map the simulation's coordinate system to the canvas coordinate system for proper rendering. Two simple yet essential functions handle this conversion:
 cX(x)
 Converts the x-coordinate from simulation space to canvas space.

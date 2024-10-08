@@ -19,7 +19,9 @@ The 2D Wind Tunnel Simulator includes the following files:
   
 </div>
 
-## Fluid Simulation Core `windtunnel.js`
+## Javascript Implementation in `windtunnel.js`
+* 'Class Fluid{}': 
+ Fluid Simulation Core 
 The heart of our 2D Wind Tunnel Simulator is the Fluid class, which implements the core fluid dynamics simulation. This class uses a semi-Lagrangian method for advection and a Jacobi iteration method for pressure solving, providing a balance between accuracy and computational efficiency.
 Key Components
 ## Constructor

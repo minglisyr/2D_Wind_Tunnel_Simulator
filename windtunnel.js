@@ -120,20 +120,6 @@ class Fluid {
             sx * ty * f[x0 * n + y1];
     }
 
-    avgU(i, j) {
-        // Calculate average horizontal velocity at cell center
-        const n = this.numY;
-        return (this.u[i * n + j - 1] + this.u[i * n + j] +
-            this.u[(i + 1) * n + j - 1] + this.u[(i + 1) * n + j]) * 0.25;
-    }
-
-    avgV(i, j) {
-        // Calculate average vertical velocity at cell center
-        const n = this.numY;
-        return (this.v[(i - 1) * n + j] + this.v[i * n + j] +
-            this.v[(i - 1) * n + j + 1] + this.v[i * n + j + 1]) * 0.25;
-    }
-
     applyBoundaryConditions() {
         const n = this.numY;
 
@@ -165,21 +151,25 @@ class Fluid {
                     let x = i * h;
                     let y = j * h + h2;
                     let u = this.u[i * n + j];
-                    let v = this.avgV(i, j);
+                    let v = (this.v[(i - 1) * n + j] + this.v[i * n + j] + this.v[(i - 1) * n + j + 1] + this.v[i * n + j + 1]) * 0.25;
+
                     x = x - dt * u;
                     y = y - dt * v;
                     u = this.fieldCalc(x, y, U_FIELD);
+
                     this.newU[i * n + j] = u;
                 }
                 // Advect vertical velocity
                 if (this.s[i * n + j] != 0.0 && this.s[i * n + j - 1] != 0.0 && i < this.numX - 1) {
                     let x = i * h + h2;
                     let y = j * h;
-                    let u = this.avgU(i, j);
+                    let u = (this.u[i * n + j - 1] + this.u[i * n + j] + this.u[(i + 1) * n + j - 1] + this.u[(i + 1) * n + j]) * 0.25;
+
                     let v = this.v[i * n + j];
                     x = x - dt * u;
                     y = y - dt * v;
                     v = this.fieldCalc(x, y, V_FIELD);
+
                     this.newV[i * n + j] = v;
                 }
             }
@@ -288,7 +278,7 @@ function setupScene() {
 }
 
 // -------------------------Color Style-----------------------------
-function getSciColor(val, minVal, maxVal) {    
+function getSciColor(val, minVal, maxVal) {
     // Normalize field values to a range of [0,1]
     val = Math.min(Math.max(val, minVal), maxVal - Number.EPSILON);
     let d = maxVal - minVal;
@@ -326,7 +316,6 @@ function getSciColor(val, minVal, maxVal) {
             color.b = 0.0;
             break;
     }
-
     return [255 * color.r, 255 * color.g, 255 * color.b, 255]
 }
 
@@ -456,10 +445,9 @@ function map() {
 }
 
 function drawObstacle() {
-
     let bottomCorrection = scene.hiRes ? 1 : 0.2;
-
     r = scene.obstacleRadius + f.h;
+
     ctx.fillStyle = scene.showPressure ? "#000000" : "#BBBBBB";
     ctx.beginPath();
     ctx.arc(cX(scene.obstacleX), cY(scene.obstacleY), cScale * r, Math.PI, 2.0 * Math.PI);
@@ -478,7 +466,6 @@ function drawObstacle() {
     ctx.moveTo(cX(scene.obstacleX - r), cY(scene.obstacleY + bottomCorrection * f.h));
     ctx.lineTo(cX(scene.obstacleX + r), cY(scene.obstacleY + bottomCorrection * f.h));
     ctx.stroke();
-
     ctx.lineWidth = 1.0;
 }
 
@@ -594,7 +581,7 @@ function stepMotion() {
     scene.paused = true;
 }
 
-// Main --------------------------------------------------
+//--------------Main Simulation Loop--------------------------------
 function simulate() {
     if (!scene.paused)
         scene.fluid.simulate(scene.dt, scene.maxIters)
@@ -649,5 +636,5 @@ function init() {
         console.error("Error setting up UI controls:", error);
     }
 }
-
+//------------- Action on Page Loading -----------
 init();

@@ -20,6 +20,7 @@ The 2D Wind Tunnel Simulator includes the following files:
 </div>
 
 ## Javascript Implementation in `windtunnel.js`
+#### Core Algorithm of Fluid Simulator
 * `Class Fluid`: The heart of 2D Wind Tunnel Simulator, which implements the core fluid dynamics simulation. 
   * `constructor(numX, numY, h, density)`: Initializes the fluid grid (with extra boundary cells and properties (velocity fields, pressure, smoke density).
   * `solveIncomp(dt, maxIters)`: Solves for incompressibility using Jacobi iteration method. Calculates pressure and applies pressure corrections to enforce the divergence-free condition.
@@ -28,55 +29,24 @@ The 2D Wind Tunnel Simulator includes the following files:
   * `applyBoundaryConditions()`: Handles boundary conditions by extrapolating velocities to boundary cells.
   * `advectVel(dt) and advectSmoke(dt)`: Advects the velocity field and smoke density field using the semi-Lagrangian method.
   * `simulate(dt, maxIters)`: Main simulation step that combines all components: pressure solving, boundary condition application, and advection.
-  * `fieldCalc(x, y, field)`:
-  * `fieldCalc(x, y, field)`: 
-  * `fieldCalc(x, y, field)`: 
-
-
 
 ##### Remarks
 * The `Semi-Lagrangian Method` was chosen for advection due to its unconditional stability, allowing for larger time steps without numerical instability.
-* The `Jacobi Iteration Method` was chosen for pressure solving for its simplicity and ease of implementation. While not the fastest method, it's sufficiently efficient for our 2D simulation and easier to understand, making the code more accessible for educational purposes. For higher resolution real-time solving, `Multigrid solver`  might be a better choice.
+* The `Jacobi Iteration Method` was chosen for pressure solving for its simplicity and ease of implementation. While not the fastest method, it's sufficiently efficient for our 2D simulation and easier to understand, making the code more accessible for educational purposes. For higher resolution real-time solving, `Multigrid solver` might be a better choice.
 * The `Staggered Grid` is used to store pressure at cell centers, and velocity components are stored on cell faces, which helps in reducing numerical instabilities and provides more accurate pressure gradient calculations.
 * The `Over-Relaxation` is used for faster convergence in the pressure solving step, at the cost of potential instability if set too high.
 
-These design choices aim to create a fluid simulation that is computationally efficient enough to run in real-time in a web browser while still providing accurate and visually appealing results. The code structure also allows for easy extension and modification, making it suitable for educational purposes and further experimentation.
-
 </div>
+#### Core Algorithm of Fluid Simulator
+* `setupScene()`: Initializes the fluid simulation domain, sets boundary conditions, and configures various simulation parameters.
+  * `Resolution Setting`: Allows switching between high (240x240) and standard (80x80) resolution. Adjusts the time step for high-resolution mode to maintain stability.
+  * `Domain Configuration`: Sets up the simulation domain based on the chosen resolution. Calculates the number of cells in X and Y directions to maintain the aspect ratio.
+  * `Fluid Initialization`: Creates a new Fluid instance with the calculated parameters.
+  * `Boundary Conditions`: Sets up solid boundaries (s = 0) at the top, bottom, and left edges of the domain. Initializes the inlet velocity at the left boundary.
+  * `Smoke Initialization`: Initializes a vertical strip of smoke near the left boundary for flow visualization.
+  * `Obstacle Placement`: Places the obstacle (simulated car) in the wind tunnel.
+  * `UI Synchronization`: Ensures that the UI controls reflect the current simulation settings.
 
-# Scene Setup and Initialization
-The setupScene() function plays a vital role in setting up the initial conditions for our 2D Wind Tunnel Simulator. This function initializes the fluid simulation domain, sets boundary conditions, and configures various simulation parameters.
-Key Components and Functionality
-## Resolution Setting
-Allows switching between high (240x240) and standard (80x80) resolution.
-Adjusts the time step for high-resolution mode to maintain stability.
-## Domain Configuration
-Sets up the simulation domain based on the chosen resolution.
-Calculates the number of cells in X and Y directions to maintain the aspect ratio.
-## Fluid Initialization
-Creates a new Fluid instance with the calculated parameters.
-## Boundary Conditions
-Sets up solid boundaries (s = 0) at the top, bottom, and left edges of the domain.
-Initializes the inlet velocity at the left boundary.
-## Smoke Initialization
-Initializes a vertical strip of smoke near the left boundary for flow visualization.
-## Obstacle Placement
-Places the obstacle (simulated car) in the wind tunnel.
-## UI Synchronization
-Ensures that the UI controls reflect the current simulation settings.
-# Design Choices and Rationale
-## Flexible Resolution:
-The option to switch between high and standard resolution allows users to balance between simulation accuracy and performance based on their hardware capabilities.
-## Aspect Ratio Preservation:
-The domain width is calculated to maintain the correct aspect ratio, ensuring the simulation accurately represents the intended physical space.
-## Density Setting:
-Using a realistic fluid density (998.0, close to water) provides physically accurate behavior, though the simulation is scale-invariant.
-## Boundary Conditions:
-Solid boundaries are set up to create a confined wind tunnel effect.
-The inlet velocity is set at the left boundary to simulate wind.
-## Smoke Initialization:
-A thin strip of smoke is initialized for better flow visualization, enhancing the educational value of the simulation.
-## UI Synchronization:
 Ensures that the user interface accurately reflects the current state of the simulation, improving user experience and preventing confusion.
 This setup function demonstrates the careful balance between physical accuracy, computational efficiency, and user experience in creating an educational fluid dynamics simulation. It provides a solid foundation for the simulation while allowing for easy adjustments and extensions.
 

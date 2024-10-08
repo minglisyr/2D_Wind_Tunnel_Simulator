@@ -109,7 +109,7 @@ The 2D Wind Tunnel Simulator includes the following files:
 8. User Controls (Restart, Pause/Resume, Step Forward)
 9. User interactive with obstacle positioning and movement
 10. Implement wind speed control and car size control
-11. Implement Hi/Low resolution switch
+11. Implement High/Standard resolution switch
 12. Performance Optimization
 13. Unit Test
 14. Publish project to GitHub Pages or similar hosting service

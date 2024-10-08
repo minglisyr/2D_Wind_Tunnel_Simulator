@@ -21,11 +21,11 @@ The 2D Wind Tunnel Simulator includes the following files:
 
 ## Javascript Implementation in `windtunnel.js`
 * `Class Fluid`: The heart of 2D Wind Tunnel Simulator, which implements the core fluid dynamics simulation. 
-** `constructor(numX, numY, h, density)`: Initializes the fluid grid (with extra boundary cells and properties (velocity fields, pressure, smoke density).
-** `solveIncomp(dt, maxIters)`: Solves for incompressibility using Jacobi iteration. Calculates pressure and applies pressure corrections to enforce the divergence-free condition.
-** `fieldCalc(x, y, field)`:
-  ** `fieldCalc(x, y, field)`:
-  ** `fieldCalc(x, y, field)`: 
+  * `constructor(numX, numY, h, density)`: Initializes the fluid grid (with extra boundary cells and properties (velocity fields, pressure, smoke density).
+  * `solveIncomp(dt, maxIters)`: Solves for incompressibility using Jacobi iteration. Calculates pressure and applies pressure corrections to enforce the divergence-free condition.
+  * `fieldCalc(x, y, field)`:
+  * `fieldCalc(x, y, field)`:
+  * `fieldCalc(x, y, field)`: 
 ## 
 Performs bilinear interpolation to calculate field values (velocity or smoke density) at arbitrary positions.
 ## avgU(i, j) and avgV(i, j)

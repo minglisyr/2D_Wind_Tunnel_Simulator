@@ -28,7 +28,6 @@ The 2D Wind Tunnel Simulator includes the following files:
     * `constructor(numX, numY, h, density)`: Initializes the fluid grid (with extra boundary cells and properties (velocity fields, pressure, smoke density).
     * `solveIncomp(dt, maxIters)`: Solves for incompressibility using Jacobi iteration method. Calculates pressure and applies pressure corrections to enforce the divergence-free condition.
     * `fieldCalc(x, y, field)`: Performs bilinear interpolation to calculate field values (velocity or smoke density) at arbitrary positions.
-    * `avgU(i, j) and avgV(i, j)`: Calculate average velocities at cell centers, crucial for advection steps.
     * `applyBoundaryConditions()`: Handles boundary conditions by extrapolating velocities to boundary cells.
     * `advectVel(dt) and advectSmoke(dt)`: Advects the velocity field and smoke density field using the semi-Lagrangian method.
     * `simulate(dt, maxIters)`: Main simulation step that combines all components: pressure solving, boundary condition application, and advection.

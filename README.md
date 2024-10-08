@@ -22,41 +22,27 @@ The 2D Wind Tunnel Simulator includes the following files:
 ## Javascript Implementation in `windtunnel.js`
 * `Class Fluid`: The heart of 2D Wind Tunnel Simulator, which implements the core fluid dynamics simulation. 
   * `constructor(numX, numY, h, density)`: Initializes the fluid grid (with extra boundary cells and properties (velocity fields, pressure, smoke density).
-  * `solveIncomp(dt, maxIters)`: Solves for incompressibility using Jacobi iteration. Calculates pressure and applies pressure corrections to enforce the divergence-free condition.
-  * `fieldCalc(x, y, field)`:
+  * `solveIncomp(dt, maxIters)`: Solves for incompressibility using Jacobi iteration method. Calculates pressure and applies pressure corrections to enforce the divergence-free condition.
+  * `fieldCalc(x, y, field)`: Performs bilinear interpolation to calculate field values (velocity or smoke density) at arbitrary positions.
+  * `avgU(i, j) and avgV(i, j)`: Calculate average velocities at cell centers, crucial for advection steps.
+  * `applyBoundaryConditions()`: Handles boundary conditions by extrapolating velocities to boundary cells.
+  * `advectVel(dt) and advectSmoke(dt)`: Advects the velocity field and smoke density field using the semi-Lagrangian method.
+  * `simulate(dt, maxIters)`: Main simulation step that combines all components: pressure solving, boundary condition application, and advection.
   * `fieldCalc(x, y, field)`:
   * `fieldCalc(x, y, field)`: 
-## 
-Performs bilinear interpolation to calculate field values (velocity or smoke density) at arbitrary positions.
-## avgU(i, j) and avgV(i, j)
-Calculate average velocities at cell centers, crucial for advection steps.
-## applyBoundaryConditions()
-Handles boundary conditions by extrapolating velocities to boundary cells.
-## advectVel(dt)
-Implements semi-Lagrangian advection for the velocity field.
-## advectSmoke(dt)
-Advects the smoke density field using the semi-Lagrangian method.
-## simulate(dt, maxIters)
-Main simulation step that combines all components: pressure solving, boundary condition application, and advection.
-# Design Choices and Rationale
-## Semi-Lagrangian Advection
-We chose the semi-Lagrangian method for advection due to its unconditional stability, allowing for larger time steps without numerical instability.
-This method provides a good balance between accuracy and computational efficiency, crucial for real-time web-based simulations.
-## Jacobi Iteration for Pressure Solving
-The Jacobi method is used for its simplicity and ease of implementation.
-While not the fastest method, it's sufficiently efficient for our 2D simulation and easier to understand, making the code more accessible for educational purposes.
-## Staggered Grid
-We use a staggered grid arrangement where pressure is stored at cell centers, and velocity components are stored on cell faces.
-This choice helps in reducing numerical instabilities and provides more accurate pressure gradient calculations.
-## Over-Relaxation Option
-The inclusion of an over-relaxation parameter (controlled by scene.overRelaxation) allows for faster convergence in the pressure solving step, at the cost of potential instability if set too high.
-## Smoke Density Simulation
-Adding smoke density simulation enhances the visual feedback of the fluid flow, making the simulation more intuitive and engaging for users.
-## Bilinear Interpolation
-The fieldCalc method uses bilinear interpolation for smooth and accurate sampling of field values between grid points.
-## Boundary Handling
-Special care is taken to handle boundaries correctly, ensuring the simulation remains stable and realistic at the edges of the domain.
+  * `fieldCalc(x, y, field)`: 
+
+
+
+##### Remarks
+* The `Semi-Lagrangian Method` was chosen for advection due to its unconditional stability, allowing for larger time steps without numerical instability.
+* The `Jacobi Iteration Method` was chosen for pressure solving for its simplicity and ease of implementation. While not the fastest method, it's sufficiently efficient for our 2D simulation and easier to understand, making the code more accessible for educational purposes. For higher resolution real-time solving, `Multigrid solver`  might be a better choice.
+* The `Staggered Grid` is used to store pressure at cell centers, and velocity components are stored on cell faces, which helps in reducing numerical instabilities and provides more accurate pressure gradient calculations.
+* The `Over-Relaxation` is used for faster convergence in the pressure solving step, at the cost of potential instability if set too high.
+
 These design choices aim to create a fluid simulation that is computationally efficient enough to run in real-time in a web browser while still providing accurate and visually appealing results. The code structure also allows for easy extension and modification, making it suitable for educational purposes and further experimentation.
+
+</div>
 
 # Scene Setup and Initialization
 The setupScene() function plays a vital role in setting up the initial conditions for our 2D Wind Tunnel Simulator. This function initializes the fluid simulation domain, sets boundary conditions, and configures various simulation parameters.

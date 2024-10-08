@@ -65,8 +65,8 @@ The 2D Wind Tunnel Simulator includes the following files:
     * `Resolution Adjustment`: Adjusts cell size based on the chosen resolution for optimal visualization.
     * `Pressure Range Calculation`: Determines the pressure range for color mapping.
     * `Pixel-by-Pixel Rendering`: Uses getImageData and putImageData for efficient pixel manipulation. Allows for fine-grained control over the visualization.
-    * `Visualization Modes`: Supports multiple visualization modes: 1)Pressure visualization with color mapping. 2)Smoke density visualization. 3)Combined pressure and smoke visualization.
-    * `Streamline Rendering`:Draws streamlines to visualize fluid flow patterns. Adjusts streamline density based on resolution.
+    * `Visualization Modes`: Supports multiple visualization modes: 1) Pressure visualization with color mapping. 2) Smoke density visualization. 3) Combined pressure and smoke visualization.
+    * `Streamline Rendering`: Draws streamlines to visualize fluid flow patterns. Adjusts streamline density based on resolution.
     * `Pressure Range Display`: Displays the current pressure range when pressure visualization is active.
 
   #### Obstacle Handling

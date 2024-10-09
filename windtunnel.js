@@ -17,31 +17,28 @@ const S_FIELD = 9;
 
 // ----------------- Fluid Core Algorithm ------------------------------
 class Fluid {
-    constructor(numX, numY, h, density) {
+    constructor(numX, numY, h) {
         // Initialize fluid properties
         this.numX = numX + 2; // Grid cells in X direction (including 2 boundary cells)
         this.numY = numY + 2; // Grid cells in Y direction (including 2 boundary cells)
         this.numCells = this.numX * this.numY; // Total number of cells
         this.h = h; // Cell size
-        this.density = density; // Fluid density
 
         // Initialize arrays for fluid properties
-        this.u = new Float32Array(this.numCells);
-        this.v = new Float32Array(this.numCells);
-        this.newU = new Float32Array(this.numCells);
-        this.newV = new Float32Array(this.numCells);
+        this.u = new Float32Array(this.numCells).fill(0.0);
+        this.v = new Float32Array(this.numCells).fill(0.0);
+        this.newU = new Float32Array(this.numCells).fill(0.0);
+        this.newV = new Float32Array(this.numCells).fill(0.0);
 
-        this.p = new Float32Array(this.numCells);
-        this.s = new Float32Array(this.numCells);
-        this.smo = new Float32Array(this.numCells);
-        this.newSMO = new Float32Array(this.numCells);
-
-        this.smo.fill(1.0); // Initialize smoke density to 1.0 everywhere
+        this.p = new Float32Array(this.numCells).fill(0.0);
+        this.s = new Float32Array(this.numCells).fill(0.0);
+        this.smo = new Float32Array(this.numCells).fill(1.0); // Initialize smoke density to 1.0 everywhere
+        this.newSMO = new Float32Array(this.numCells).fill(1.0);
     }
 
     solveIncomp(dt, maxIters) {
         const n = this.numY;
-        const cp = this.density * this.h / dt; // Pressure coefficient
+        const cp = this.h / dt; // Pressure coefficient
 
         // Jacobian iteration to solve for pressure and enforce incompressibility
         for (let iter = 0; iter < maxIters; iter++) {
@@ -77,8 +74,6 @@ class Fluid {
         // Bilinear interpolation to field calculation at given (x, y) position
         const n = this.numY;
         const h = this.h;
-        const h1 = 1.0 / h;
-        const h2 = 0.5 * h;
 
         x = Math.max(Math.min(x, this.numX * h), h);
         y = Math.max(Math.min(y, this.numY * h), h);
@@ -90,24 +85,24 @@ class Fluid {
         switch (field) {
             case U_FIELD:
                 f = this.u;
-                dy = h2;
+                dy = 0.5 * h;
                 break;
             case V_FIELD:
                 f = this.v;
-                dx = h2;
+                dx = 0.5 * h;
                 break;
             case S_FIELD:
                 f = this.smo;
-                dx = h2;
-                dy = h2;
+                dx = 0.5 * h;
+                dy = 0.5 * h;
                 break;
         }
 
-        const x0 = Math.min(Math.floor((x - dx) * h1), this.numX - 1);
-        const tx = ((x - dx) - x0 * h) * h1;
+        const x0 = Math.min(Math.floor((x - dx) / h), this.numX - 1);
+        const tx = ((x - dx) - x0 * h) / h;
         const x1 = Math.min(x0 + 1, this.numX - 1);
-        const y0 = Math.min(Math.floor((y - dy) * h1), this.numY - 1);
-        const ty = ((y - dy) - y0 * h) * h1;
+        const y0 = Math.min(Math.floor((y - dy) / h), this.numY - 1);
+        const ty = ((y - dy) - y0 * h) / h;
         const y1 = Math.min(y0 + 1, this.numY - 1);
         const sx = 1.0 - tx;
         const sy = 1.0 - ty;
@@ -140,14 +135,13 @@ class Fluid {
         this.newV.set(this.v);
         const n = this.numY;
         const h = this.h;
-        const h2 = 0.5 * h;
 
         for (let i = 1; i < this.numX; i++) {
             for (let j = 1; j < this.numY; j++) {
                 // Advect horizontal velocity
                 if (this.s[i * n + j] != 0.0 && this.s[(i - 1) * n + j] != 0.0 && j < this.numY - 1) {
                     let x = i * h;
-                    let y = j * h + h2;
+                    let y = j * h + 0.5 * h;
                     let u = this.u[i * n + j];
                     let v = (this.v[(i - 1) * n + j] + this.v[i * n + j] + this.v[(i - 1) * n + j + 1] + this.v[i * n + j + 1]) * 0.25;
 
@@ -159,7 +153,7 @@ class Fluid {
                 }
                 // Advect vertical velocity
                 if (this.s[i * n + j] != 0.0 && this.s[i * n + j - 1] != 0.0 && i < this.numX - 1) {
-                    let x = i * h + h2;
+                    let x = i * h + 0.5 * h;
                     let y = j * h;
                     let u = (this.u[i * n + j - 1] + this.u[i * n + j] + this.u[(i + 1) * n + j - 1] + this.u[(i + 1) * n + j]) * 0.25;
 
@@ -181,15 +175,14 @@ class Fluid {
         this.newSMO.set(this.smo);
         const n = this.numY;
         const h = this.h;
-        const h2 = 0.5 * h;
 
         for (let i = 1; i < this.numX - 1; i++) {
             for (let j = 1; j < this.numY - 1; j++) {
                 if (this.s[i * n + j] != 0.0) {
                     const u = (this.u[i * n + j] + this.u[(i + 1) * n + j]) * 0.5;
                     const v = (this.v[i * n + j] + this.v[i * n + j + 1]) * 0.5;
-                    const x = i * h + h2 - dt * u;
-                    const y = j * h + h2 - dt * v;
+                    const x = i * h + 0.5 * h - dt * u;
+                    const y = j * h + 0.5 * h - dt * v;
                     this.newSMO[i * n + j] = this.fieldCalc(x, y, S_FIELD);
                 }
             }
@@ -197,7 +190,7 @@ class Fluid {
         this.smo.set(this.newSMO);
     }
 
-    simulate(dt, maxIters) {
+    sim(dt, maxIters) {
         this.p.fill(0.0); // Reset pressure
         this.solveIncomp(dt, maxIters);
         this.applyBoundaryConditions();
@@ -209,7 +202,6 @@ class Fluid {
 const scene = {
     dt: 1.0 / 60.0,
     maxIters: 50,
-    frameNum: 0,
     overRelaxation: 1.75,
     obstacleRadius: 0.1,
     obstacleX: 0.6,
@@ -219,7 +211,6 @@ const scene = {
     showPressure: false,
     showSmoke: true,
     hiRes: false,
-    fluid: null
 };
 
 // -------------------------Canvas Creation-----------------------------
@@ -237,8 +228,7 @@ function setupScene() {
     const h = domainHeight / res;
     const numX = Math.floor(domainWidth / h);
     const numY = Math.floor(domainHeight / h);
-    const density = 998.0;
-    const f = scene.fluid = new Fluid(numX, numY, h, density);
+    const f = scene.fluid = new Fluid(numX, numY, h);
     const n = f.numY;
 
     // Set up inflow winds
@@ -330,9 +320,9 @@ function map() {
     ctx.fillStyle = "#DDDDDD";
     f = scene.fluid;
     const n = f.numY;
-    const h = f.h;    
+    const h = f.h;
     const cellScale = scene.hiRes ? 3.3 : 1.1; // Adjust cell scale based on resolution
-    
+
     // Calculate pressure range
     minP = f.p[0];
     maxP = f.p[0];
@@ -363,7 +353,7 @@ function map() {
                 // Show smoke density
                 const s = f.smo[i * n + j];
                 color[0] = color[1] = color[2] = 255 * s;
-            } else if (f.s[i * n + j] == 0.0) {                
+            } else if (f.s[i * n + j] == 0.0) {
                 color[0] = color[1] = color[2] = 0; // Color for solid cells
             }
 
@@ -384,14 +374,14 @@ function map() {
                 }
             }
         }
-    }    
+    }
     ctx.putImageData(imgdata, 0, 0); // Apply the pixel data to the canvas
 
     // Draw streamlines if enabled
     if (scene.showStreamlines) {
         const numSegs = 15;
         const lenSegs = 0.0075;
-        ctx.strokeStyle = "#000000";      
+        ctx.strokeStyle = "#000000";
         const streamlineStep = scene.hiRes ? 15 : 5; // Adjust streamline density based on resolution
 
         // Loop through grid to draw streamlines
@@ -457,7 +447,7 @@ function drawObstacle() {
 function setObstacle(x, y, reset) {
     let vx = 0.0;
     let vy = 0.0;
-    
+
     if (!reset) {
         vx = (x - scene.obstacleX) / scene.dt;
         vy = (y - scene.obstacleY) / scene.dt;
@@ -561,8 +551,7 @@ function stepMotion() {
 //--------------Main Simulation Loop--------------------------------
 function simulate() {
     if (!scene.paused)
-        scene.fluid.simulate(scene.dt, scene.maxIters)
-    scene.frameNum++;
+        scene.fluid.sim(scene.dt, scene.maxIters)
 }
 
 function update() {
@@ -604,7 +593,7 @@ function init() {
             scene.hiRes = this.checked;
             setupScene();
         });
-        
+
         update(); // Initial update to ensure everything is drawn
 
     } catch (error) {

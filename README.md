@@ -100,7 +100,7 @@ The 2D Wind Tunnel Simulator includes the following files:
 6. Implement streamline visualization option
 7. Implement smoke visualization option
 8. User Controls (Restart, Pause/Resume, Step Forward)
-9. User interactive with obstacle positioning and movement
+9. User interaction with obstacle positioning and movement
 10. Implement wind speed control and car size control
 11. Implement High/Standard resolution switch
 12. Performance Optimization
@@ -108,13 +108,9 @@ The 2D Wind Tunnel Simulator includes the following files:
 14. Publish project to GitHub Pages or similar hosting service
 15. Create project showcase video and update README with link
 
-</div>
-
 ## Future Development:
 1. Complicated/User-defined car-shape obstacle (obstacle detector with arbitary shapes)
 2. Multigrid solver for higher resolution implementation
-
-</div>
 
 ## References:
 1. [Chentanez, N., Muller, M. (2011). NVIDIA PhysX Research, Real-Time Eulerian Water Simulation Using a Restricted Tall Cell Grid](https://matthias-research.github.io/pages/publications/tallCells.pdf#:~:text=We%20present%20a%20new%20Eulerian%20fluid)

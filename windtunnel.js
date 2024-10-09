@@ -190,7 +190,7 @@ class Fluid {
         this.smo.set(this.newSMO);
     }
 
-    sim(dt, maxIters) {
+    main(dt, maxIters) {
         this.p.fill(0.0); // Reset pressure
         this.solveIncomp(dt, maxIters);
         this.applyBoundaryConditions();
@@ -551,7 +551,7 @@ function stepMotion() {
 //--------------Main Simulation Loop--------------------------------
 function simulate() {
     if (!scene.paused)
-        scene.fluid.sim(scene.dt, scene.maxIters)
+        scene.fluid.main(scene.dt, scene.maxIters)
 }
 
 function update() {

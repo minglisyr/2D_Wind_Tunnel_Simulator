@@ -30,7 +30,7 @@ The 2D Wind Tunnel Simulator includes the following files:
     * `fieldCalc(x, y, field)`: Performs bilinear interpolation to calculate field values (velocity or smoke density) at arbitrary positions.
     * `applyBoundaryConditions()`: Handles boundary conditions by extrapolating velocities to boundary cells.
     * `advectVel(dt) and advectSmoke(dt)`: Advects the velocity field and smoke density field using the semi-Lagrangian method.
-    * `simulate(dt, maxIters)`: Main simulation step that combines all components: pressure solving, boundary condition application, and advection.
+    * `sim(dt, maxIters)`: Main simulation step that combines all components: pressure solving, boundary condition application, and advection.
 
     ##### Remarks
     * The `Semi-Lagrangian Method` was chosen for advection due to its unconditional stability, allowing for larger time steps without numerical instability.

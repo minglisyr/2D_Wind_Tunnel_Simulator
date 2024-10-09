@@ -32,7 +32,7 @@ The 2D Wind Tunnel Simulator includes the following files:
     * `advectVel(dt) and advectSmoke(dt)`: Advects the velocity field and smoke density field using the semi-Lagrangian method.
     * `main(dt, maxIters)`: Main simulation step that combines all components: pressure solving, boundary condition application, and advection.
 
-    ##### Remarks
+    ##### [!NOTE]
     * The `Semi-Lagrangian Method` was chosen for advection due to its unconditional stability, allowing for larger time steps without numerical instability.
     * The `Jacobi Iteration Method` was chosen for pressure solving for its simplicity and ease of implementation. While not the fastest method, it's sufficiently efficient for our 2D simulation and easier to understand, making the code more accessible for educational purposes. For higher resolution real-time solving, `Multigrid solver` might be a better choice.
     * The `Staggered Grid` is used to store pressure at cell centers, and velocity components are stored on cell faces, which helps in reducing numerical instabilities and provides more accurate pressure gradient calculations.
@@ -52,7 +52,7 @@ The 2D Wind Tunnel Simulator includes the following files:
   
   * `getSciColor(val, minVal, maxVal)`: Implements a scientific color map for visualizing scalar fields (like pressure or velocity magnitude).
     * `Color Mapping Process`:  Normalize the input value to a range of [0,1] → Divide the color spectrum into four segments → Determine which segment the normalized value falls into → Interpolate the color within that segment
-    * `Color Scheme`: $${\color{blue}Blue}$$ (0.0) → $${\color{cyan}Cyan}$$ (0.25) → $${\color{green}Green}$$Green (0.5) → $${\color{yellow}Yellow}$$ (0.75) → $${\color{red}Red}$$ (1.0)
+    * `Color Scheme`: $${\color{blue}Blue}$$ (0.0) → $${\color{cyan}Cyan}$$ (0.25) → $${\color{green}Green}$$ (0.5) → $${\color{yellow}Yellow}$$ (0.75) → $${\color{red}Red}$$ (1.0)
 
   #### Coordinate Conversion
   * `cX(x)`: Converts the x-coordinate from simulation space to canvas space. Scales the x-coordinate by cScale (canvas scale factor).
@@ -92,7 +92,7 @@ The 2D Wind Tunnel Simulator includes the following files:
     * `Direct Simulation Updates`: Changes in UI controls (like wind velocity) directly modify the simulation parameters, ensuring tight integration between the UI and the underlying physics model.
     * `Resolution Switching`: The ability to switch between standard and high-resolution modes allows users to balance between performance and detail based on their hardware capabilities.
     * `Error Handling`: The use of a try-catch block ensures that any errors during initialization are caught and logged, improving the robustness of the application.
-    ##### Remarks
+    ##### [!NOTE]
     The init() function sets the stage for user exploration and learning by ensuring that all components of the simulator – from the underlying physics model to the user interface controls – are properly initialized and interconnected. This careful setup is key to making complex fluid dynamics concepts accessible and engaging to users, regardless of their technical background.
 
 

@@ -52,7 +52,7 @@ The 2D Wind Tunnel Simulator includes the following files:
   
   * `getSciColor(val, minVal, maxVal)`: Implements a scientific color map for visualizing scalar fields (like pressure or velocity magnitude).
     * `Color Mapping Process`:  Normalize the input value to a range of [0,1] → Divide the color spectrum into four segments → Determine which segment the normalized value falls into → Interpolate the color within that segment
-    * `Color Scheme`: Blue (0.0) → Cyan (0.25) → Green (0.5) → Yellow (0.75) → Red (1.0)
+    * `Color Scheme`: Blue (0.0) → Cyan (0.25) → Green (0.5) → Yellow (0.75) → $${\color{red}Red}$$ (1.0)
 
   #### Coordinate Conversion
   * `cX(x)`: Converts the x-coordinate from simulation space to canvas space. Scales the x-coordinate by cScale (canvas scale factor).

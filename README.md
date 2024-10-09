@@ -32,7 +32,7 @@ The 2D Wind Tunnel Simulator includes the following files:
     * `advectVel(dt) and advectSmoke(dt)`: Advects the velocity field and smoke density field using the semi-Lagrangian method.
     * `main(dt, maxIters)`: Main simulation step that combines all components: pressure solving, boundary condition application, and advection.
 
-    > [!note]
+    > [!NOTE]
     > * The `Semi-Lagrangian Method` was chosen for advection due to its unconditional stability, allowing for larger time steps without numerical instability.
     > * The `Jacobi Iteration Method` was chosen for pressure solving for its simplicity and ease of implementation. While not the fastest method, it's sufficiently efficient for our 2D simulation and easier to understand, making the code more accessible for educational purposes. For higher resolution real-time solving, `Multigrid solver` might be a better choice.
     > * The `Staggered Grid` is used to store pressure at cell centers, and velocity components are stored on cell faces, which helps in reducing numerical instabilities and provides more accurate pressure gradient calculations.

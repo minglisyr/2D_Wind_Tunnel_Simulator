@@ -18,8 +18,6 @@ The 2D Wind Tunnel Simulator includes the following files:
 * `styles.css`: the file for Styling and User Interface Design 
 * `windtunnel.js`: the javascript file for Fluid Solver, Visualization and Interactive Control
   
-</div>
-
 ## Javascript Implementation in `windtunnel.js`
   #### Core Algorithm of Fluid Simulator
   * `Class Fluid`: The heart of 2D Wind Tunnel Simulator, which implements the core fluid dynamics simulation. 
@@ -36,7 +34,7 @@ The 2D Wind Tunnel Simulator includes the following files:
     * The `Staggered Grid` is used to store pressure at cell centers, and velocity components are stored on cell faces, which helps in reducing numerical instabilities and provides more accurate pressure gradient calculations.
     * The `Over-Relaxation` is used for faster convergence in the pressure solving step, at the cost of potential instability if set too high.
 
-  #### Setup Scence and Initialization
+  #### Setup Scene and Initialization
   * `setupScene()`: Initializes the fluid simulation domain, sets boundary conditions, and configures various simulation parameters.
     * `Resolution Setting`: Allows switching between high (240x240) and standard (80x80) resolution. Adjusts the time step for high-resolution mode to maintain stability.
     * `Domain Configuration`: Sets up the simulation domain based on the chosen resolution. Calculates the number of cells in X and Y directions to maintain the aspect ratio.
@@ -92,9 +90,6 @@ The 2D Wind Tunnel Simulator includes the following files:
     * `Error Handling`: The use of a try-catch block ensures that any errors during initialization are caught and logged, improving the robustness of the application.
     ##### Remarks
     The init() function sets the stage for user exploration and learning by ensuring that all components of the simulator – from the underlying physics model to the user interface controls – are properly initialized and interconnected. This careful setup is key to making complex fluid dynamics concepts accessible and engaging to users, regardless of their technical background.
-
-
-</div>
 
 ## TODO List (for CS50x):
 1. Create basic file structure (HTML, CSS, JavaScript)

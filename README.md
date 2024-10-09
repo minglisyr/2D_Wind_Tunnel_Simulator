@@ -10,7 +10,7 @@
 2. Adjustable wind speed and car size
 3. Interactive flow field display
 
-</div>
+
 
 ## Structure
 The 2D Wind Tunnel Simulator includes the following files:

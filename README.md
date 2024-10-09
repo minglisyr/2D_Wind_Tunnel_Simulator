@@ -118,7 +118,7 @@ The 2D Wind Tunnel Simulator includes the following files:
 </div>
 
 ## Future Development:
-1. Complicated/User-defined Car-shape obstacle (obstacle detector with arbitary shapes)
+1. Complicated/User-defined car-shape obstacle (obstacle detector with arbitary shapes)
 2. Multigrid solver for higher resolution implementation
 
 </div>

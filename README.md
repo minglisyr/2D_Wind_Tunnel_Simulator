@@ -10,6 +10,9 @@
 2. Adjustable wind speed and car size
 3. Interactive flow field display
 
+## Update Logs:
+Ferrari car shape implementation @ 10/17/2024
+
 ## Structure
 The 2D Wind Tunnel Simulator includes the following files:
 * `README.md`: this file

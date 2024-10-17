@@ -498,7 +498,10 @@ function setObstacle(x, y, reset) {
     const n = f.numY;
 
     // Calculate bounding box of the car shape
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    let minX = Infinity,
+        maxX = -Infinity,
+        minY = Infinity,
+        maxY = -Infinity;
     for (let point of carShape) {
         minX = Math.min(minX, point.x);
         maxX = Math.max(maxX, point.x);
@@ -534,11 +537,13 @@ function setObstacle(x, y, reset) {
 function isPointInCarShape(x, y) {
     let inside = false;
     for (let i = 0, j = carShape.length - 1; i < carShape.length; j = i++) {
-        let xi = carShape[i].x, yi = carShape[i].y;
-        let xj = carShape[j].x, yj = carShape[j].y;
+        let xi = carShape[i].x,
+            yi = carShape[i].y;
+        let xj = carShape[j].x,
+            yj = carShape[j].y;
 
-        let intersect = ((yi > y) != (yj > y))
-            && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        let intersect = ((yi > y) != (yj > y)) &&
+            (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
         if (intersect) inside = !inside;
     }
     return inside;
@@ -624,7 +629,7 @@ function simulate() {
 function update() {
     simulate();
     map();
-    drawObstacle(scene.obstacleX, scene.obstacleY, scene.obstacleRadius*2.1);
+    drawObstacle(scene.obstacleX, scene.obstacleY, scene.obstacleRadius * 2.1);
     requestAnimationFrame(update);
 }
 

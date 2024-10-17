@@ -202,16 +202,57 @@ class Fluid {
 const scene = {
     dt: 1.0 / 60.0,
     maxIters: 50,
-    overRelaxation: 1.75,
+    overRelaxation: 1.95,
     obstacleRadius: 0.1,
     obstacleX: 0.6,
-    obstacleY: 0.05,
+    obstacleY: 0.1,
     paused: false,
     showStreamlines: false,
     showPressure: false,
     showSmoke: true,
     hiRes: false,
 };
+
+// Ferrari carshape
+const carShape = [
+    {x: -0.5217875382395382, y: -0.003661971830985916},
+    {x: -0.5050327510917031, y: 0.015070422535211268},
+    {x: -0.40744997270955165, y: 0.054037267080745345},
+    {x: -0.33837057142857145, y: 0.07300469483568075},
+    {x: -0.2645505382131325, y: 0.07974178403755868},
+    {x: -0.19117031630170316, y: 0.08300469483568075},
+    {x: -0.14042712329932498, y: 0.10066901408450704},
+    {x: -0.04156051587301587, y: 0.15117370892018778},
+    {x: 0.010712329932498273, y: 0.16638028169014087},
+    {x: 0.08368614718614719, y: 0.17162441314553992},
+    {x: 0.17472712329932498, y: 0.16267605633802816},
+    {x: 0.24462329932498274, y: 0.14178403755868544},
+    {x: 0.3140232993249827, y: 0.11805164319248826},
+    {x: 0.40376051587301585, y: 0.10412207357859532},
+    {x: 0.4614705382131325, y: 0.10784037558685446},
+    {x: 0.4423614718614719, y: 0.09216431924882629},
+    {x: 0.4462329932498274, y: 0.07037558685446009},
+    {x: 0.45627510917030566, y: 0.03531924882629108},
+    {x: 0.45735473684210525, y: -0.0014836795252225519},
+    {x: 0.47497270955165693, y: -0.014983568075117372},
+    {x: 0.45518614718614717, y: -0.061596244131455396},
+    {x: 0.43275382395382395, y: -0.07443661971830986},
+    {x: 0.3599705382131325, y: -0.08379108635097493},
+    {x: 0.31706051587301586, y: -0.11667136150234742},
+    {x: 0.2892232993249827, y: -0.12410305164319249},
+    {x: 0.24895382395382395, y: -0.11949765258215962},
+    {x: 0.20734891774891774, y: -0.09752347417840376},
+    {x: 0.11481688311688311, y: -0.09687793427230047},
+    {x: -0.27107510917030566, y: -0.10166901408450704},
+    {x: -0.29744997270955164, y: -0.11908450704225352},
+    {x: -0.3337878306878307, y: -0.12561502347417841},
+    {x: -0.36758306878306877, y: -0.12061502347417841},
+    {x: -0.4000327510917031, y: -0.10122065727699531},
+    {x: -0.5089042712329933, y: -0.09644366197183099},
+    {x: -0.5319705382131325, y: -0.08578873239436619},
+    {x: -0.5189042712329933, y: -0.06354460093896714},
+    {x: -0.5247757915057915, y: -0.016291079812206575}
+];
 
 // -------------------------Canvas Creation-----------------------------
 function setupScene() {
@@ -419,27 +460,26 @@ function map() {
     }
 }
 
-function drawObstacle() {
-    let bottomCorrection = scene.hiRes ? 1 : 0.2;
-    r = scene.obstacleRadius + f.h;
-
-    ctx.fillStyle = scene.showPressure ? "#000000" : "#BBBBBB";
-    ctx.beginPath();
-    ctx.arc(cX(scene.obstacleX), cY(scene.obstacleY), cScale * r, Math.PI, 2.0 * Math.PI);
-    ctx.closePath();
-    ctx.fill();
-
+// Function to draw the car
+function drawObstacle(centerX, centerY, scaleRadius) {
     ctx.lineWidth = 4.0;
-    ctx.strokeStyle = "#000000";
     ctx.beginPath();
-    ctx.arc(cX(scene.obstacleX), cY(scene.obstacleY), cScale * r, Math.PI, 2.0 * Math.PI);
-    ctx.closePath();
-    ctx.stroke();
+    ctx.moveTo(
+        cX(centerX + carShape[0].x * scaleRadius),
+        cY(centerY + carShape[0].y * scaleRadius)
+    );
 
-    ctx.lineWidth = 8.0;
-    ctx.beginPath();
-    ctx.moveTo(cX(scene.obstacleX - r), cY(scene.obstacleY + bottomCorrection * f.h));
-    ctx.lineTo(cX(scene.obstacleX + r), cY(scene.obstacleY + bottomCorrection * f.h));
+    for (let i = 1; i < carShape.length; i++) {
+        ctx.lineTo(
+            cX(centerX + carShape[i].x * scaleRadius),
+            cY(centerY + carShape[i].y * scaleRadius)
+        );
+    }
+
+    ctx.closePath();
+    ctx.strokeStyle = '#000000';
+    ctx.fillStyle = scene.showPressure ? "#000000" : "#FF0000";
+    ctx.fill();
     ctx.stroke();
     ctx.lineWidth = 1.0;
 }
@@ -454,18 +494,32 @@ function setObstacle(x, y, reset) {
     }
     scene.obstacleX = x;
     scene.obstacleY = y;
-    const r = scene.obstacleRadius;
     const f = scene.fluid;
     const n = f.numY;
+
+    // Calculate bounding box of the car shape
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (let point of carShape) {
+        minX = Math.min(minX, point.x);
+        maxX = Math.max(maxX, point.x);
+        minY = Math.min(minY, point.y);
+        maxY = Math.max(maxY, point.y);
+    }
+
+    // Scale factor (adjust this to change the size of the car)
+    const scale = scene.obstacleRadius * 2 / Math.max(maxX - minX, maxY - minY);
 
     for (let i = 1; i < f.numX - 2; i++) {
         for (let j = 1; j < f.numY - 2; j++) {
             f.s[i * n + j] = 1.0;
-            dx = (i + 0.5) * f.h - x;
-            dy = (j + 0.5) * f.h - y;
+            let dx = (i + 0.5) * f.h - x;
+            let dy = (j + 0.5) * f.h - y;
 
-            // Half circle, downwards facing
-            if (dx * dx + dy * dy < r * r && dy > 0) {
+            // Transform to car's local coordinates
+            let localX = dx / scale;
+            let localY = dy / scale;
+
+            if (isPointInCarShape(localX, localY)) {
                 f.s[i * n + j] = 0.0;
                 f.smo[i * n + j] = 1.0;
                 f.u[i * n + j] = vx;
@@ -475,6 +529,19 @@ function setObstacle(x, y, reset) {
             }
         }
     }
+}
+
+function isPointInCarShape(x, y) {
+    let inside = false;
+    for (let i = 0, j = carShape.length - 1; i < carShape.length; j = i++) {
+        let xi = carShape[i].x, yi = carShape[i].y;
+        let xj = carShape[j].x, yj = carShape[j].y;
+
+        let intersect = ((yi > y) != (yj > y))
+            && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+    return inside;
 }
 
 // Interactions ------------------------------------------
@@ -557,7 +624,7 @@ function simulate() {
 function update() {
     simulate();
     map();
-    drawObstacle();
+    drawObstacle(scene.obstacleX, scene.obstacleY, scene.obstacleRadius*2.1);
     requestAnimationFrame(update);
 }
 

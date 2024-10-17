@@ -26,14 +26,14 @@
             Smoke
         </label>
         <label for="overrelaxButton">
-            <input type="checkbox" id="overrelaxButton" onclick="scene.overRelaxation = scene.overRelaxation == 1.0 ? 1.75 : 1.0" checked>
+            <input type="checkbox" id="overrelaxButton" onclick="scene.overRelaxation = scene.overRelaxation == 1.0 ? 1.95 : 1.0" checked>
             Over-Relaxation
         </label>
         <input type="checkbox" id="hiResButton" onclick="scene.hiRes = !scene.hiRes;">
         <label for="hiResButton" class="red-text"> High Resolution</label>
 
-        <input type="range" id="radiusSlider" min="0.05" max="0.20" step="0.01" value="0.10">
-        <label for="radiusSlider">Obstacle Radius: <span id="radiusValue">0.1</span></label>
+        <input type="range" id="radiusSlider" min="0.1" max="0.30" step="0.01" value="0.20">
+        <label for="radiusSlider">Car Size: <span id="radiusValue">0.1</span></label>
 
         <input type="range" id="windSlider" min="0.05" max="5.00" step="0.01" value="2.00">
         <label for="windSlider">Wind Speed: <span id="windValue">2.0</span></label>

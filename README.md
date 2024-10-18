@@ -1,7 +1,7 @@
 # Web based 2D Wind Tunnel Simulator
 #### Video Demo:  [https://youtu.be/6dyL0lQyOko](https://youtu.be/6dyL0lQyOko)
 [Project Web Hosting](https://minglisyr.github.io/2D_Wind_Tunnel_Simulator)
-#### Description: The Web-based 2D Wind Tunnel Simulator is an interactive educational tool designed to simulate airflow around a simplified car (half circle) in a two-dimensional environment. This project aims to provide students, engineers, and aerodynamics enthusiasts with a user-friendly platform to visualize and understand fluid dynamics principles without the need for complex physical setups or expensive software.
+#### Description: The Web-based 2D Wind Tunnel Simulator is an interactive educational tool designed to simulate airflow around a simplified car in a two-dimensional environment. This project aims to provide students, engineers, and aerodynamics enthusiasts with a user-friendly platform to visualize and understand fluid dynamics principles without the need for complex physical setups or expensive software.
 
 ![Demo](https://github.com/minglisyr/2D_Wind_Tunnel_Simulator/blob/main/Demo.gif)
 
@@ -12,14 +12,17 @@
 
 ## Update Logs:
 Ferrari car shape implementation @ 10/17/2024
+Ford F150 and minivan car shaped added @ 10/18/2024
 
 ## Structure
 The 2D Wind Tunnel Simulator includes the following files:
 * `README.md`: this file
 * `LICENSE`: the MIT License file
 * `index.html`: the Simulator User Interface with control buttons, visualization options and simulation parameters
+* `carLib.html`: introduction for various car models available in this simulator
 * `styles.css`: the file for Styling and User Interface Design 
 * `windtunnel.js`: the javascript file for Fluid Solver, Visualization and Interactive Control
+* `JPG/PNG`: pictures for vairous car models, from the Internet
   
 ## Javascript Implementation in `windtunnel.js`
   #### Core Algorithm of Fluid Simulator
@@ -37,6 +40,12 @@ The 2D Wind Tunnel Simulator includes the following files:
     * The `Staggered Grid` is used to store pressure at cell centers, and velocity components are stored on cell faces, which helps in reducing numerical instabilities and provides more accurate pressure gradient calculations.
     * The `Over-Relaxation` is used for faster convergence in the pressure solving step, at the cost of potential instability if set too high.
 
+  #### Import various car models
+  * `carShape_xxx[]`: contains (x,y) coordinates for side-view of various car models
+
+  #### Switch car models
+  * `changeCarModel(model)`: switch among available car models
+
   #### Setup Scene and Initialization
   * `setupScene()`: Initializes the fluid simulation domain, sets boundary conditions, and configures various simulation parameters.
     * `Resolution Setting`: Allows switching between high (240x240) and standard (80x80) resolution. Adjusts the time step for high-resolution mode to maintain stability.
@@ -47,8 +56,7 @@ The 2D Wind Tunnel Simulator includes the following files:
     * `Obstacle Placement`: Places the obstacle (simulated car) in the wind tunnel.
     * `UI Synchronization`: Ensures that the UI controls reflect the current simulation settings.
 
-  #### Color Management and Visualization
-  
+  #### Color Management and Visualization  
   * `getSciColor(val, minVal, maxVal)`: Implements a scientific color map for visualizing scalar fields (like pressure or velocity magnitude).
     * `Color Mapping Process`:  Normalize the input value to a range of [0,1] → Divide the color spectrum into four segments → Determine which segment the normalized value falls into → Interpolate the color within that segment
     * `Color Scheme`: $${\color{blue}Blue}$$ (0.0) → $${\color{cyan}Cyan}$$ (0.25) → $${\color{green}Green}$$ (0.5) → $${\color{yellow}Yellow}$$ (0.75) → $${\color{red}Red}$$ (1.0)
@@ -72,10 +80,10 @@ The 2D Wind Tunnel Simulator includes the following files:
     * Updates the obstacle's position in the simulation.
     * Calculates the obstacle's velocity if it's being moved.
     * Modifies the fluid simulation grid to account for the obstacle's presence.
-  * `drawObstacle()`: This function is responsible for rendering the obstacle on the canvas.
-    * Draws a half-circle shape to represent the car.
+  * `isPointInCarShape(x, y)`: This function determines the inside/outside of obstacle, supporting setObstacle().  
+  * `drawObstacle(centerX, centerY, scaleRadius)`: This function is responsible for rendering the car-shape obstacle on the canvas.
+    * Draws the car-shape outlines.
     * Adjusts the appearance based on the current visualization mode (pressure or normal).
-    * Adds a bottom line to complete the car silhouette.
 
   #### User Interaction and Simulation Control
 | Mouse Interaction         | Simulation Control     | Main Simulation Loop |
@@ -94,25 +102,8 @@ The 2D Wind Tunnel Simulator includes the following files:
     ##### Remarks
     The init() function sets the stage for user exploration and learning by ensuring that all components of the simulator – from the underlying physics model to the user interface controls – are properly initialized and interconnected. This careful setup is key to making complex fluid dynamics concepts accessible and engaging to users, regardless of their technical background.
 
-## TODO List (for CS50x):
-1. Create basic file structure (HTML, CSS, JavaScript)
-2. Design main layout
-3. Create responsive grid for simulation area
-4. Core Simulation Logic
-5. Implement color-coded velocity and pressure mapping
-6. Implement streamline visualization option
-7. Implement smoke visualization option
-8. User Controls (Restart, Pause/Resume, Step Forward)
-9. User interaction with obstacle positioning and movement
-10. Implement wind speed control and car size control
-11. Implement High/Standard resolution switch
-12. Performance Optimization
-13. Unit Test
-14. Publish project to GitHub Pages or similar hosting service
-15. Create project showcase video and update README with link
-
 ## Future Development:
-1. Complicated/User-defined car-shape obstacle (obstacle detector with arbitary shapes)
+1. User-defined car-shape obstacles
 2. Multigrid solver for higher resolution implementation
 
 ## References:

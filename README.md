@@ -12,7 +12,8 @@
 
 ## Update Logs:
 * Ferrari car shape implementation @ 10/17/2024
-* Ford F150 and minivan car shaped added @ 10/18/2024
+* Ford F150 and minivan car shape added @ 10/18/2024
+* UFO shape added @ 10/18/2024
 
 ## Structure
 The 2D Wind Tunnel Simulator includes the following files:

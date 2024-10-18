@@ -11,8 +11,8 @@
 3. Interactive flow field display
 
 ## Update Logs:
-Ferrari car shape implementation @ 10/17/2024
-Ford F150 and minivan car shaped added @ 10/18/2024
+* Ferrari car shape implementation @ 10/17/2024
+* Ford F150 and minivan car shaped added @ 10/18/2024
 
 ## Structure
 The 2D Wind Tunnel Simulator includes the following files:
@@ -41,7 +41,7 @@ The 2D Wind Tunnel Simulator includes the following files:
     * The `Over-Relaxation` is used for faster convergence in the pressure solving step, at the cost of potential instability if set too high.
 
   #### Import various car models
-  * `carShape_xxx[]`: contains (x,y) coordinates for side-view of various car models
+  * `carShape_xxx = [...]`: contains (x,y) coordinates for side-view of various car models
 
   #### Switch car models
   * `changeCarModel(model)`: switch among available car models

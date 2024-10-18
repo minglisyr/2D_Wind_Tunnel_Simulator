@@ -9,6 +9,12 @@
     </head>
 
     <body>
+        <div id="ufo-container">
+            <div id="ufo">
+                <div id="alien">👽</div>
+            </div>
+        </div>
+
         <div class="header">
             <a class="back-button" href="index.html">Back to Simulator</a>
         </div>
@@ -65,6 +71,26 @@
                 </p>
             </div>
         </div>
+
+        <script>
+            function moveUFO() {
+                const ufo = document.getElementById('ufo');
+                const maxX = window.innerWidth - ufo.offsetWidth;
+                const maxY = window.innerHeight - ufo.offsetHeight;
+
+                const newX = Math.random() * maxX;
+                const newY = Math.random() * maxY;
+
+                ufo.style.left = `${newX}px`;
+                ufo.style.top = `${newY}px`;
+            }
+
+            // Move the UFO every 3 seconds
+            setInterval(moveUFO, 3000);
+
+            // Initial position
+            moveUFO();
+        </script>
     </body>
 
 </html>

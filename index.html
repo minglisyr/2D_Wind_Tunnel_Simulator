@@ -32,10 +32,20 @@
         <input type="checkbox" id="hiResButton" onclick="scene.hiRes = !scene.hiRes;">
         <label for="hiResButton" class="red-text"> High Resolution</label>
 
-        <input type="range" id="radiusSlider" min="0.1" max="0.30" step="0.01" value="0.20">
-        <label for="radiusSlider">Car Size: <span id="radiusValue">0.1</span></label>
+        <a href="carLib.html" style="margin-left: 50px;">Car Model:</a>
+        <input type="radio" id="ferrariModel" name="carModel" value="Ferrari" checked onclick="changeCarModel('Ferrari')">
+        <label for="ferrariModel">Ferrari</label>
 
-        <input type="range" id="windSlider" min="0.05" max="5.00" step="0.01" value="2.00">
+        <input type="radio" id="fordF150Model" name="carModel" value="Ford F150" onclick="changeCarModel('Ford F150')">
+        <label for="fordF150Model">Ford F150</label>
+
+        <input type="radio" id="minivanModel" name="carModel" value="Minivan" onclick="changeCarModel('Minivan')">
+        <label for="minivanModel">Minivan</label>
+
+        <input type="range" id="radiusSlider" min="0.5" max="1.5" step="0.01" value="1.0">
+        <label for="radiusSlider">Car Size: <span id="radiusValue">1.0</span></label>
+
+        <input type="range" id="windSlider" min="0.05" max="5.00" step="0.01" value="2.0">
         <label for="windSlider">Wind Speed: <span id="windValue">2.0</span></label>
 
         <canvas id="myCanvas"></canvas>

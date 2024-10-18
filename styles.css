@@ -1,6 +1,8 @@
 body {
-    font-family: Trebuchet MS;
+    font-family: Trebuchet MS, Arial, sans-serif;
     font-size: 12px;
+    margin: 0;
+    padding: 0;
 }
 
 .button {
@@ -50,6 +52,9 @@ body {
     color: red;
 }
 
+input[type="radio"] {
+    margin-left: 5px;
+}
 
 input[type="range"] {
     margin-left: 25px;
@@ -59,7 +64,72 @@ input[type="range"] {
     margin-left: 50px;
 }
 
-
 #myCanvas {
     border: 3px solid;
+}
+
+/* Styles from carLib.html */
+.header {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 10px;
+    height: calc(100vh - 100px);
+    padding: 0 20px;
+}
+
+.grid-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.grid-item img {
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.description {
+    font-size: 16px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+h3 {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.back-button {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.back-button:hover {
+    background-color: #0056b3;
+}
+
+.specs {
+    font-size: 16px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    margin-top: 10px;
 }

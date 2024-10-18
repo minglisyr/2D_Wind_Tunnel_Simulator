@@ -133,3 +133,40 @@ h3 {
     border-radius: 5px;
     margin-top: 10px;
 }
+
+#ufo-container {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+#ufo {
+    position: absolute;
+    width: 150px;
+    height: 80px;
+    background-color: #c0c0c0;
+    border-radius: 50%;
+    box-shadow: 0 0 20px #00ffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: float 10s infinite ease-in-out;
+}
+
+#alien {
+    font-size: 64px;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}

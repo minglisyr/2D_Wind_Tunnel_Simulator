@@ -23,7 +23,7 @@ The 2D Wind Tunnel Simulator includes the following files:
 * `carLib.html`: introduction for various car models available in this simulator
 * `styles.css`: the file for Styling and User Interface Design 
 * `windtunnel.js`: the javascript file for Fluid Solver, Visualization and Interactive Control
-* `JPG/PNG`: pictures for vairous car models, from the Internet
+* `assets/`: folder contains pictures for vairous car models, from the Internet
   
 ## Javascript Implementation in `windtunnel.js`
   #### Core Algorithm of Fluid Simulator
